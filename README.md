@@ -6,6 +6,8 @@
 
 Go client for [Remember The Milk API v2](https://www.rememberthemilk.com/services/api/).
 
+Note: this product uses the Remember The Milk API but is not endorsed or certified by Remember The Milk.
+
 # Methods
 
 | API method                                                                                                              | Package method |
