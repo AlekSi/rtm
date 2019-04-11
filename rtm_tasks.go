@@ -44,6 +44,8 @@ type TasksGetListParams struct {
 	LastSync Time
 }
 
+// https://www.rememberthemilk.com/services/api/methods/rtm.tasks.getList.rtm
+// NOT STABLE YET
 func (t *TasksService) GetList(ctx context.Context, params *TasksGetListParams) (map[string][]TaskSeries, error) {
 	args := make(Args)
 	if params != nil {
@@ -106,6 +108,7 @@ type tasksAddResponse struct {
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.add.rtm
+// NOT STABLE YET
 func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAddParams) error {
 	args := Args{
 		"name": params.Name,
