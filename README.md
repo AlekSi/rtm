@@ -31,6 +31,7 @@ Note: this product uses the Remember The Milk API but is not endorsed or certifi
 | [`rtm.lists.setName`](https://www.rememberthemilk.com/services/api/methods/rtm.lists.setName.rtm)                       | TODO
 | [`rtm.lists.unarchive`](https://www.rememberthemilk.com/services/api/methods/rtm.lists.unarchive.rtm)                   | TODO
 | [`rtm.locations.getList`](https://www.rememberthemilk.com/services/api/methods/rtm.locations.getList.rtm)               | TODO
+| [`rtm.tags.getList`](https://www.rememberthemilk.com/services/api/methods/rtm.tags.getList.rtm)                         | TODO
 | [`rtm.reflection.getMethodInfo`](https://www.rememberthemilk.com/services/api/methods/rtm.reflection.getMethodInfo.rtm) | [`ReflectionService.GetMethodInfo`](https://godoc.org/github.com/AlekSi/rtm#ReflectionService.GetMethodInfo)
 | [`rtm.reflection.getMethods`](https://www.rememberthemilk.com/services/api/methods/rtm.reflection.getMethods.rtm)       | [`ReflectionService.GetMethods`](https://godoc.org/github.com/AlekSi/rtm#ReflectionService.GetMethods)
 | [`rtm.settings.getList`](https://www.rememberthemilk.com/services/api/methods/rtm.settings.getList.rtm)                 | TODO

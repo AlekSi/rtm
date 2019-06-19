@@ -1,6 +1,7 @@
 package rtm
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,6 +21,7 @@ func TestReflection(t *testing.T) {
 
 	t.Run("GetMethods", func(t *testing.T) {
 		actual, err := GetClient(t).Reflection().GetMethods(Ctx)
+		sort.Strings(actual)
 		require.NoError(t, err)
 		expected := []string{
 			"rtm.auth.checkToken",
@@ -44,6 +46,7 @@ func TestReflection(t *testing.T) {
 			"rtm.reflection.getMethodInfo",
 			"rtm.reflection.getMethods",
 			"rtm.settings.getList",
+			"rtm.tags.getList",
 			"rtm.tasks.add",
 			"rtm.tasks.addTags",
 			"rtm.tasks.complete",
