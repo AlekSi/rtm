@@ -76,11 +76,34 @@ func TestTasks(t *testing.T) {
 	})
 
 	t.Run("AddDecode", func(t *testing.T) {
-		t.Skip("TODO")
-
 		var actual tasksAddResponse
-		decodeFile(t, "rtm.tasks.add.xml", &actual)
-		expected := tasksAddResponse{}
+		decodeFile(t, "rtm.tasks.add.rtm.xml", &actual)
+		expected := tasksAddResponse{
+			// XMLName: xml.Name{Local: "list"},
+			TaskSeries: TaskSeries{
+				ID:       "987654321",
+				Created:  parseTime("2015-05-07T10:19:54Z"),
+				Modified: parseTime("2015-05-07T10:19:54Z"),
+				Name:     "Get Bananas",
+				Source:   "api",
+				Task: []Task{{
+					ID:       "123456789",
+					Added:    parseTime("2015-05-07T10:19:54Z"),
+					Priority: "N",
+				}},
+			},
+		}
 		assert.Equal(t, expected, actual)
+	})
+
+	t.Run("AddDelete", func(t *testing.T) {
+		timeline, err := GetClient(t).Timelines().Create(Ctx)
+		require.NoError(t, err)
+
+		task, err := GetClient(t).Tasks().Add(Ctx, timeline, TasksAddParams{
+			Name: t.Name(),
+		})
+		require.NoError(t, err)
+		t.Log(task)
 	})
 }

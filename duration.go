@@ -56,6 +56,14 @@ func (d *Duration) UnmarshalText(data []byte) error {
 	return nil
 }
 
+// parseDuration parses duration from string ignoring errors.
+// See Duration.UnmarshalText for the version with error handling.
+func parseDuration(s string) Duration {
+	var d Duration
+	_ = d.UnmarshalText([]byte(s))
+	return d
+}
+
 // check interfaces
 var (
 	_ fmt.Stringer             = Duration{}

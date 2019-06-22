@@ -45,7 +45,6 @@ type TasksGetListParams struct {
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.getList.rtm
-// NOT STABLE YET
 func (t *TasksService) GetList(ctx context.Context, params *TasksGetListParams) (map[string][]TaskSeries, error) {
 	args := make(Args)
 	if params != nil {
@@ -104,14 +103,18 @@ type TasksAddParams struct {
 }
 
 type tasksAddResponse struct {
-	XMLName xml.Name `xml:"list"`
+	XMLName     xml.Name
+	Transaction transaction `xml:"transaction"`
+	// TransactionID       string     `xml:"transaction,attr"`
+	// TransactionUndoable bool       `xml:"transaction,attr"`
+	TaskSeries TaskSeries `xml:"taskseries"`
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.add.rtm
-// NOT STABLE YET
-func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAddParams) error {
+func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAddParams) (*TaskSeries, error) {
 	args := Args{
-		"name": params.Name,
+		"timeline": timeline,
+		"name":     params.Name,
 	}
 	if params.ListID != "" {
 		args["list_id"] = params.ListID
@@ -123,5 +126,33 @@ func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAdd
 		args["parent_task_id"] = params.ParentTaskID
 	}
 
-	return nil
+	b, err := t.client.Call(ctx, "rtm.tasks.add", args)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp tasksAddResponse
+	if err = xml.Unmarshal(b, &resp); err != nil {
+		return nil, err
+	}
+	return &resp.TaskSeries, nil
+}
+
+type TasksDeleteParams struct {
+	ListID       string
+	TaskSeriesID string
+	TaskID       string
+}
+
+// https://www.rememberthemilk.com/services/api/methods/rtm.tasks.delete.rtm
+func (t *TasksService) Delete(ctx context.Context, timeline string, params TasksDeleteParams) error {
+	args := Args{
+		"timeline":      timeline,
+		"list_id":       params.ListID,
+		"taskseries_id": params.TaskSeriesID,
+		"task_id":       params.TaskID,
+	}
+
+	_, err := t.client.Call(ctx, "rtm.tasks.delete.rtm", args)
+	return err
 }

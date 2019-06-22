@@ -48,6 +48,14 @@ func (t Time) withoutTime() Time {
 	return Time{time.Date(year, month, day, 0, 0, 0, 0, time.UTC)}
 }
 
+// parseTime parses time from string ignoring errors.
+// See Time.UnmarshalText for the version with error handling.
+func parseTime(s string) Time {
+	var t Time
+	_ = t.UnmarshalText([]byte(s))
+	return t
+}
+
 // check interfaces
 var (
 	_ fmt.Stringer             = Time{}
