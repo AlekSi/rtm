@@ -21,11 +21,9 @@ func TestDuration(t *testing.T) {
 			err := actual.UnmarshalText([]byte(text))
 			require.NoError(t, err)
 			assert.Equal(t, Duration{expected}, actual)
-
-			// TODO
-			// actualText, err := actual.MarshalText()
-			// require.NoError(t, err)
-			// assert.Equal(t, text, string(actualText))
+			actualText, err := actual.MarshalText()
+			require.NoError(t, err)
+			assert.Equal(t, text, string(actualText))
 		})
 	}
 }

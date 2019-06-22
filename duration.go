@@ -4,6 +4,7 @@ import (
 	"encoding"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -14,7 +15,24 @@ type Duration struct {
 }
 
 func (d Duration) String() string {
-	panic("rtm.Duration.String is not implemented!")
+	if d.Duration == 0 {
+		return ""
+	}
+
+	res := "PT"
+	td := d.Duration
+	if h := td / time.Hour; h > 0 {
+		res += strconv.Itoa(int(h)) + "H"
+		td -= h * time.Hour
+	}
+	if m := td / time.Minute; m > 0 {
+		res += strconv.Itoa(int(m)) + "M"
+		td -= m * time.Minute
+	}
+	if s := td / time.Second; s > 0 {
+		res += strconv.Itoa(int(s)) + "S"
+	}
+	return res
 }
 
 // MarshalText implements encoding.TextMarshaler.
