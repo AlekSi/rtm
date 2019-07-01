@@ -27,10 +27,6 @@ func (d Duration) String() string {
 	}
 	if m := td / time.Minute; m > 0 {
 		res += strconv.Itoa(int(m)) + "M"
-		td -= m * time.Minute
-	}
-	if s := td / time.Second; s > 0 {
-		res += strconv.Itoa(int(s)) + "S"
 	}
 	return res
 }
