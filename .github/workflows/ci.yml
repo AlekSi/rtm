@@ -28,6 +28,10 @@ jobs:
 
     - name: Test
       run: go test -v -coverprofile=cover.out -covermode=count ./...
+      env:
+        RTM_TEST_KEY:    ${{ secrets.RTM_TEST_KEY }}
+        RTM_TEST_SECRET: ${{ secrets.RTM_TEST_SECRET }}
+        RTM_TEST_TOKEN:  ${{ secrets.RTM_TEST_TOKEN }}
 
     - name: Upload coverage report
       run: curl -s https://codecov.io/bash | bash -s -- -X fix
