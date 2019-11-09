@@ -1,6 +1,5 @@
 # rtm
 
-
 [![CI status](https://github.com/AlekSi/rtm/workflows/CI/badge.svg)](https://github.com/AlekSi/rtm/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/AlekSi/rtm)](https://goreportcard.com/report/github.com/AlekSi/rtm)
 [![GoDoc](https://godoc.org/github.com/AlekSi/rtm?status.svg)](https://godoc.org/github.com/AlekSi/rtm)
