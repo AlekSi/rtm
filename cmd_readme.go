@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 	"text/tabwriter"
 
@@ -33,6 +34,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	sort.Strings(methods)
 
 	clientT := reflect.TypeOf(client)
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
