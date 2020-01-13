@@ -1,4 +1,7 @@
 all: test
 
-test:
-	go test -v -coverprofile=cover.out
+install:
+	go install -v ./...
+
+test: install
+	go test -coverprofile=cover.out ./...
