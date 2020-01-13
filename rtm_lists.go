@@ -3,7 +3,6 @@ package rtm
 import (
 	"context"
 	"encoding/xml"
-	"sort"
 )
 
 type ListsService struct {
@@ -34,6 +33,5 @@ func (l *ListsService) GetList(ctx context.Context) ([]List, error) {
 		return nil, err
 	}
 
-	sort.Slice(resp.Lists, func(i, j int) bool { return resp.Lists[i].ID < resp.Lists[j].ID })
 	return resp.Lists, nil
 }

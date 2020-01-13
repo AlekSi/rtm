@@ -1,0 +1,9 @@
+<transaction id="4605582597" undoable="0" />
+<list id="43911488">
+  <taskseries id="403802838" created="2020-01-13T06:11:18Z" modified="2020-01-13T06:11:18Z" name="TestTasks/AddDelete" source="api" url="" location_id="" parent_task_id="">
+    <tags />
+    <participants />
+    <notes />
+    <task id="706227851" due="" has_due_time="0" added="2020-01-13T06:11:18Z" completed="" deleted="" priority="N" postponed="0" estimate="" start="" has_start_time="0" />
+  </taskseries>
+</list>

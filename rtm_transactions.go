@@ -1,9 +1,11 @@
 package rtm
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+)
 
-type transaction struct {
+type Transaction struct {
 	XMLName  xml.Name `xml:"transaction"`
-	ID       string   `xml:",attr"`
-	Undoable bool     `xml:",attr"`
+	ID       string   `xml:"id,attr"`
+	Undoable bool     `xml:"undoable,attr"`
 }

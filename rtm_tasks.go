@@ -3,7 +3,6 @@ package rtm
 import (
 	"context"
 	"encoding/xml"
-	"sort"
 )
 
 type TasksService struct {
@@ -78,8 +77,6 @@ func (t *TasksService) GetList(ctx context.Context, params *TasksGetListParams) 
 
 	res := make(map[string][]TaskSeries, len(resp.Lists))
 	for _, list := range resp.Lists {
-		sort.Slice(list.TaskSeries, func(i, j int) bool { return list.TaskSeries[i].ID < list.TaskSeries[j].ID })
-
 		// for i, series := range list.TaskSeries {
 		// 	for j, task := range series.Task {
 		// 		if !task.HasDueTime {
@@ -102,12 +99,15 @@ type TasksAddParams struct {
 	ParentTaskID string
 }
 
-type tasksAddResponse struct {
-	XMLName     xml.Name
-	Transaction transaction `xml:"transaction"`
-	// TransactionID       string     `xml:"transaction,attr"`
-	// TransactionUndoable bool       `xml:"transaction,attr"`
+type tasksAddResponseList struct {
+	XMLName    xml.Name   `xml:"list"`
+	ListID     string     `xml:"id,attr"`
 	TaskSeries TaskSeries `xml:"taskseries"`
+}
+
+type tasksAddResponse struct {
+	Transaction          *Transaction         `xml:"transaction"`
+	TasksAddResponseList tasksAddResponseList `xml:"list"`
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.add.rtm
@@ -135,7 +135,8 @@ func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAdd
 	if err = xml.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
-	return &resp.TaskSeries, nil
+
+	return &resp.TasksAddResponseList.TaskSeries, nil
 }
 
 type TasksDeleteParams struct {

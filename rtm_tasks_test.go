@@ -1,6 +1,7 @@
 package rtm
 
 import (
+	"encoding/xml"
 	"testing"
 	"time"
 
@@ -79,31 +80,74 @@ func TestTasks(t *testing.T) {
 		var actual tasksAddResponse
 		decodeFile(t, "rtm.tasks.add.rtm.xml", &actual)
 		expected := tasksAddResponse{
-			// XMLName: xml.Name{Local: "list"},
-			TaskSeries: TaskSeries{
-				ID:       "987654321",
-				Created:  parseTime("2015-05-07T10:19:54Z"),
-				Modified: parseTime("2015-05-07T10:19:54Z"),
-				Name:     "Get Bananas",
-				Source:   "api",
-				Task: []Task{{
-					ID:       "123456789",
-					Added:    parseTime("2015-05-07T10:19:54Z"),
-					Priority: "N",
-				}},
+			TasksAddResponseList: tasksAddResponseList{
+				XMLName: xml.Name{Local: "list"},
+				ListID:  "987654321",
+				TaskSeries: TaskSeries{
+					ID:       "987654321",
+					Created:  parseTime("2015-05-07T10:19:54Z"),
+					Modified: parseTime("2015-05-07T10:19:54Z"),
+					Name:     "Get Bananas",
+					Source:   "api",
+					Task: []Task{{
+						ID:       "123456789",
+						Added:    parseTime("2015-05-07T10:19:54Z"),
+						Priority: "N",
+					}},
+				},
+			},
+		}
+		assert.Equal(t, expected, actual)
+	})
+
+	t.Run("AddDecode2", func(t *testing.T) {
+		t.Skip("TODO")
+
+		var actual tasksAddResponse
+		decodeFile(t, "rtm.tasks.add.rtm2.xml", &actual)
+		expected := tasksAddResponse{
+			Transaction: &Transaction{
+				XMLName:  xml.Name{Local: "transaction"},
+				ID:       "4605582597",
+				Undoable: false,
+			},
+			TasksAddResponseList: tasksAddResponseList{
+				TaskSeries: TaskSeries{
+					ID:       "987654321",
+					Created:  parseTime("2015-05-07T10:19:54Z"),
+					Modified: parseTime("2015-05-07T10:19:54Z"),
+					Name:     "Get Bananas",
+					Source:   "api",
+					Task: []Task{{
+						ID:       "123456789",
+						Added:    parseTime("2015-05-07T10:19:54Z"),
+						Priority: "N",
+					}},
+				},
 			},
 		}
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("AddDelete", func(t *testing.T) {
+		t.Skip("TODO")
+
 		timeline, err := GetClient(t).Timelines().Create(Ctx)
 		require.NoError(t, err)
 
 		task, err := GetClient(t).Tasks().Add(Ctx, timeline, TasksAddParams{
-			Name: t.Name(),
+			ListID: "43911488",
+			Name:   t.Name(),
 		})
 		require.NoError(t, err)
 		t.Log(task)
+		require.NotEmpty(t, task.Task)
+
+		err = GetClient(t).Tasks().Delete(Ctx, timeline, TasksDeleteParams{
+			ListID:       "43911488",
+			TaskSeriesID: task.ID,
+			TaskID:       task.Task[0].ID,
+		})
+		require.NoError(t, err)
 	})
 }
