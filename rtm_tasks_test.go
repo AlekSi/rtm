@@ -40,13 +40,11 @@ func TestTasks(t *testing.T) {
 						},
 					},
 				}, {
-					ID:         "358441583",
-					Created:    Time{time.Date(2018, 8, 5, 9, 30, 56, 0, time.UTC)},
-					Modified:   Time{time.Date(2018, 8, 5, 13, 42, 43, 0, time.UTC)},
-					Name:       "Задача 2",
-					Source:     "js",
-					URL:        "",
-					LocationID: "",
+					ID:       "358441583",
+					Created:  Time{time.Date(2018, 8, 5, 9, 30, 56, 0, time.UTC)},
+					Modified: Time{time.Date(2018, 8, 5, 13, 42, 43, 0, time.UTC)},
+					Name:     "Задача 2",
+					Source:   "js",
 					Task: []Task{
 						{
 							ID:           "622345833",
@@ -78,49 +76,24 @@ func TestTasks(t *testing.T) {
 
 	t.Run("AddDecode", func(t *testing.T) {
 		var actual tasksAddResponse
-		decodeFile(t, "rtm.tasks.add.rtm.xml", &actual)
-		expected := tasksAddResponse{
-			TasksAddResponseList: tasksAddResponseList{
-				XMLName: xml.Name{Local: "list"},
-				ListID:  "987654321",
-				TaskSeries: TaskSeries{
-					ID:       "987654321",
-					Created:  parseTime("2015-05-07T10:19:54Z"),
-					Modified: parseTime("2015-05-07T10:19:54Z"),
-					Name:     "Get Bananas",
-					Source:   "api",
-					Task: []Task{{
-						ID:       "123456789",
-						Added:    parseTime("2015-05-07T10:19:54Z"),
-						Priority: "N",
-					}},
-				},
-			},
-		}
-		assert.Equal(t, expected, actual)
-	})
-
-	t.Run("AddDecode2", func(t *testing.T) {
-		t.Skip("TODO")
-
-		var actual tasksAddResponse
-		decodeFile(t, "rtm.tasks.add.rtm2.xml", &actual)
+		unmarshalFile(t, "rtm.tasks.add.xml", &actual)
 		expected := tasksAddResponse{
 			Transaction: &Transaction{
-				XMLName:  xml.Name{Local: "transaction"},
-				ID:       "4605582597",
-				Undoable: false,
+				XMLName: xml.Name{Local: "transaction"},
+				ID:      "4613647463",
 			},
 			TasksAddResponseList: tasksAddResponseList{
+				XMLName: xml.Name{Local: "list"},
+				ListID:  "43911488",
 				TaskSeries: TaskSeries{
-					ID:       "987654321",
-					Created:  parseTime("2015-05-07T10:19:54Z"),
-					Modified: parseTime("2015-05-07T10:19:54Z"),
-					Name:     "Get Bananas",
-					Source:   "api",
+					ID:       "403924673",
+					Created:  parseTime("2020-01-14T06:23:58Z"),
+					Modified: parseTime("2020-01-14T06:23:58Z"),
+					Name:     "TestTasks/AddDelete",
+					Source:   "api:XXX",
 					Task: []Task{{
-						ID:       "123456789",
-						Added:    parseTime("2015-05-07T10:19:54Z"),
+						ID:       "706419831",
+						Added:    parseTime("2020-01-14T06:23:58Z"),
 						Priority: "N",
 					}},
 				},
@@ -130,8 +103,6 @@ func TestTasks(t *testing.T) {
 	})
 
 	t.Run("AddDelete", func(t *testing.T) {
-		t.Skip("TODO")
-
 		timeline, err := GetClient(t).Timelines().Create(Ctx)
 		require.NoError(t, err)
 

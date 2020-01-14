@@ -60,7 +60,7 @@ func getCreds(t testing.TB) (key, secret, token string) {
 	return
 }
 
-func decodeFile(t testing.TB, filename string, v interface{}) {
+func unmarshalFile(t testing.TB, filename string, v interface{}) {
 	t.Helper()
 
 	b, err := ioutil.ReadFile(filepath.Join("testdata", filename))
@@ -88,10 +88,11 @@ func TestMain(m *testing.M) {
 		}
 
 		return &Client{
-			APIKey:      key,
-			APISecret:   secret,
-			AuthToken:   token,
-			DebugLogger: t.Log,
+			APIKey:         key,
+			APISecret:      secret,
+			AuthToken:      token,
+			DebugLogger:    t.Log,
+			recordTestdata: true,
 		}
 	}
 

@@ -11,7 +11,9 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"path/filepath"
 	"sort"
+	"strings"
 )
 
 const (
@@ -47,6 +49,8 @@ type Client struct {
 	AuthToken   string
 	HTTPClient  *http.Client
 	DebugLogger func(v ...interface{})
+
+	recordTestdata bool
 }
 
 func (c *Client) Auth() *AuthService             { return &AuthService{c} }
@@ -151,7 +155,25 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 		return nil, fmt.Errorf("HTTP status code %d", resp.StatusCode)
 	}
 
-	return ioutil.ReadAll(resp.Body)
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if c.recordTestdata {
+		filename := filepath.Join("testdata", "tmp-"+method+".xml")
+		s := string(b)
+		for _, p := range []string{c.APIKey, c.APISecret, c.AuthToken} {
+			if p != "" {
+				s = strings.Replace(s, p, "XXX", -1)
+			}
+		}
+		if err = ioutil.WriteFile(filename, []byte(s), 0666); err != nil {
+			return nil, err
+		}
+	}
+
+	return b, nil
 }
 
 type Error struct {
@@ -163,19 +185,14 @@ func (e *Error) Error() string {
 	return fmt.Sprintf("%d: %s", e.Code, e.Msg)
 }
 
-func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, error) {
-	b, err := c.post(ctx, method, args, "")
-	if err != nil {
-		return nil, err
-	}
-
+func unmarshalRsp(b []byte) ([]byte, error) {
 	var rsp struct {
 		XMLName xml.Name `xml:"rsp"`
 		Stat    string   `xml:"stat,attr"`
 		Err     *Error   `xml:"err"`
 		Inner   []byte   `xml:",innerxml"`
 	}
-	err = xml.Unmarshal(b, &rsp)
+	err := xml.Unmarshal(b, &rsp)
 	switch {
 	case err != nil:
 		return nil, err
@@ -186,6 +203,15 @@ func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, er
 	default:
 		return rsp.Inner, nil
 	}
+}
+
+func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, error) {
+	b, err := c.post(ctx, method, args, "")
+	if err != nil {
+		return nil, err
+	}
+
+	return unmarshalRsp(b)
 }
 
 // check interfaces
