@@ -3,6 +3,7 @@ package rtm
 import (
 	"context"
 	"encoding/xml"
+	"log"
 )
 
 type TasksService struct {
@@ -135,6 +136,7 @@ func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAdd
 	if err = xml.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
+	log.Printf("TasksService.Add response: %+v", resp)
 
 	return &resp.TasksAddResponseList.TaskSeries, nil
 }
