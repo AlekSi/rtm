@@ -1,11 +1,17 @@
+---
 name: CI
-on: [push, pull_request]
+on:
+  schedule:
+    # run every Saturday
+    - cron: "0 12 * * 6"
+  push:
+  pull_request:
 
 jobs:
   test:
     strategy:
       matrix:
-        go: [1.13.x]
+        go: [1.14.x]
 
     name: Test with Go ${{ matrix.go }}
     runs-on: ubuntu-18.04
