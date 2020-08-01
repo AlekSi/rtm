@@ -3,7 +3,6 @@ package rtm
 import (
 	"context"
 	"encoding/xml"
-	"log"
 )
 
 type TasksService struct {
@@ -55,6 +54,25 @@ type tasksGetListResponse struct {
 	Lists   []tasksGetListResponseList `xml:"list"`
 }
 
+func (t *tasksGetListResponse) toMap() map[string][]TaskSeries {
+	res := make(map[string][]TaskSeries, len(t.Lists))
+	for _, list := range t.Lists {
+		// for i, series := range list.TaskSeries {
+		// 	for j, task := range series.Task {
+		// 		if !task.HasDueTime {
+		// 			list.TaskSeries[i].Task[j].Due = task.Due.withoutTime()
+		// 		}
+		// 		if !task.HasStartTime {
+		// 			list.TaskSeries[i].Task[j].Start = task.Start.withoutTime()
+		// 		}
+		// 	}
+		// }
+		res[list.ID] = list.TaskSeries
+	}
+
+	return res
+}
+
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.getList.rtm
 func (t *TasksService) GetList(ctx context.Context, params *TasksGetListParams) (map[string][]TaskSeries, error) {
 	args := make(Args)
@@ -79,22 +97,7 @@ func (t *TasksService) GetList(ctx context.Context, params *TasksGetListParams) 
 	if err = xml.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
-
-	res := make(map[string][]TaskSeries, len(resp.Lists))
-	for _, list := range resp.Lists {
-		// for i, series := range list.TaskSeries {
-		// 	for j, task := range series.Task {
-		// 		if !task.HasDueTime {
-		// 			list.TaskSeries[i].Task[j].Due = task.Due.withoutTime()
-		// 		}
-		// 		if !task.HasStartTime {
-		// 			list.TaskSeries[i].Task[j].Start = task.Start.withoutTime()
-		// 		}
-		// 	}
-		// }
-		res[list.ID] = list.TaskSeries
-	}
-	return res, nil
+	return resp.toMap(), nil
 }
 
 type TasksAddParams struct {
@@ -140,7 +143,6 @@ func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAdd
 	if err = xml.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
-	log.Printf("TasksService.Add response: %+v", resp)
 
 	return &resp.TasksAddResponseList.TaskSeries, nil
 }
