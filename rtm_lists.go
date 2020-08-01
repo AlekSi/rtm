@@ -18,6 +18,11 @@ type List struct {
 	Smart    bool   `xml:"smart,attr"`
 }
 
+type listsGetListResponse struct {
+	XMLName xml.Name `xml:"lists"`
+	Lists   []List   `xml:"list"`
+}
+
 // https://www.rememberthemilk.com/services/api/methods/rtm.lists.getList.rtm
 func (l *ListsService) GetList(ctx context.Context) ([]List, error) {
 	b, err := l.client.Call(ctx, "rtm.lists.getList", nil)
@@ -25,10 +30,7 @@ func (l *ListsService) GetList(ctx context.Context) ([]List, error) {
 		return nil, err
 	}
 
-	var resp struct {
-		XMLName xml.Name `xml:"lists"`
-		Lists   []List   `xml:"list"`
-	}
+	var resp listsGetListResponse
 	if err = xml.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}

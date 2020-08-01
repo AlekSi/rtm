@@ -39,25 +39,6 @@ func TestTasks(t *testing.T) {
 							HasStartTime: true,
 						},
 					},
-				}, {
-					ID:       "358441583",
-					Created:  Time{time.Date(2018, 8, 5, 9, 30, 56, 0, time.UTC)},
-					Modified: Time{time.Date(2018, 8, 5, 13, 42, 43, 0, time.UTC)},
-					Name:     "Задача 2",
-					Source:   "js",
-					Task: []Task{
-						{
-							ID:           "622345833",
-							Due:          Time{time.Date(2018, 8, 5, 21, 0, 0, 0, time.UTC)},
-							HasDueTime:   false,
-							Added:        Time{time.Date(2018, 8, 5, 9, 30, 56, 0, time.UTC)},
-							Completed:    Time{time.Date(2018, 8, 5, 13, 42, 43, 0, time.UTC)},
-							Priority:     "2",
-							Estimate:     Duration{time.Hour + 12*time.Minute},
-							Start:        Time{time.Date(2018, 8, 4, 21, 0, 0, 0, time.UTC)},
-							HasStartTime: false,
-						},
-					},
 				},
 			},
 		}
@@ -76,7 +57,7 @@ func TestTasks(t *testing.T) {
 
 	t.Run("AddDecode", func(t *testing.T) {
 		var actual tasksAddResponse
-		unmarshalFile(t, "rtm.tasks.add.xml", &actual)
+		unmarshalTestdataFile(t, "rtm.tasks.add.xml", &actual)
 		expected := tasksAddResponse{
 			Transaction: &Transaction{
 				XMLName: xml.Name{Local: "transaction"},

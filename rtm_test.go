@@ -60,10 +60,12 @@ func getCreds(t testing.TB) (key, secret, token string) {
 	return
 }
 
-func unmarshalFile(t testing.TB, filename string, v interface{}) {
+func unmarshalTestdataFile(t testing.TB, filename string, v interface{}) {
 	t.Helper()
 
 	b, err := ioutil.ReadFile(filepath.Join("testdata", filename))
+	require.NoError(t, err)
+	b, err = unmarshalXMLRsp(b)
 	require.NoError(t, err)
 	err = xml.Unmarshal(b, v)
 	require.NoError(t, err)

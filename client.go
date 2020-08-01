@@ -43,13 +43,6 @@ const (
 
 type Args map[string]string
 
-type xmlResponse struct {
-	XMLName xml.Name `xml:"rsp"`
-	Stat    string   `xml:"stat,attr"`
-	Err     *Error   `xml:"err"`
-	Inner   []byte   `xml:",innerxml"`
-}
-
 type Client struct {
 	APIKey     string
 	APISecret  string
@@ -188,7 +181,12 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 }
 
 func unmarshalXMLRsp(b []byte) ([]byte, error) {
-	var rsp xmlResponse
+	var rsp struct {
+		XMLName xml.Name `xml:"rsp"`
+		Stat    string   `xml:"stat,attr"`
+		Err     *Error   `xml:"err"`
+		Inner   []byte   `xml:",innerxml"`
+	}
 	err := xml.Unmarshal(b, &rsp)
 	switch {
 	case err != nil:
