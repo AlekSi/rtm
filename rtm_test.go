@@ -33,9 +33,9 @@ func getCreds(t testing.TB) (key, secret, token string) {
 	}
 
 	client := &Client{
-		APIKey:      key,
-		APISecret:   secret,
-		DebugLogger: t.Log,
+		APIKey:    key,
+		APISecret: secret,
+		Debugf:    t.Logf,
 	}
 
 	frob, err := client.Auth().GetFrob(Ctx)
@@ -91,7 +91,7 @@ func TestMain(m *testing.M) {
 			APIKey:         key,
 			APISecret:      secret,
 			AuthToken:      token,
-			DebugLogger:    t.Log,
+			Debugf:         t.Logf,
 			recordTestdata: true,
 		}
 	}

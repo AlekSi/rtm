@@ -44,11 +44,11 @@ const (
 type Args map[string]string
 
 type Client struct {
-	APIKey      string
-	APISecret   string
-	AuthToken   string
-	HTTPClient  *http.Client
-	DebugLogger func(v ...interface{})
+	APIKey     string
+	APISecret  string
+	AuthToken  string
+	HTTPClient *http.Client
+	Debugf     func(format string, args ...interface{})
 
 	recordTestdata bool
 }
@@ -128,24 +128,24 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 	req = req.WithContext(ctx)
 	req.Header.Set("User-Agent", userAgent)
 
-	if c.DebugLogger != nil {
+	if c.Debugf != nil {
 		b, err := httputil.DumpRequestOut(req, true)
 		if err != nil {
 			return nil, err
 		}
-		c.DebugLogger(string(b))
+		c.Debugf("Request:\n%s", b)
 	}
 
 	resp, err := c.http().Do(req)
 	if resp != nil {
 		defer resp.Body.Close()
 
-		if c.DebugLogger != nil {
+		if c.Debugf != nil {
 			b, err := httputil.DumpResponse(resp, true)
 			if err != nil {
 				return nil, err
 			}
-			c.DebugLogger(string(b))
+			c.Debugf("Response:\n%s", b)
 		}
 	}
 	if err != nil {
