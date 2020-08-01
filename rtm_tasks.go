@@ -11,16 +11,16 @@ type TasksService struct {
 }
 
 type TaskSeries struct {
-	ID         string `xml:"id,attr"`
-	Created    Time   `xml:"created,attr"`
-	Modified   Time   `xml:"modified,attr"`
-	Name       string `xml:"name,attr"`
-	Source     string `xml:"source,attr"`
-	URL        string `xml:"url,attr"`
-	LocationID string `xml:"location_id,attr"`
-	// Tags         []interface{} `json:"tags"`
-	// Notes        []interface{} `json:"notes"`
-	Task []Task `xml:"task"`
+	ID         string   `xml:"id,attr"`
+	Created    Time     `xml:"created,attr"`
+	Modified   Time     `xml:"modified,attr"`
+	Name       string   `xml:"name,attr"`
+	Source     string   `xml:"source,attr"`
+	URL        string   `xml:"url,attr"`
+	LocationID string   `xml:"location_id,attr"`
+	Tags       []string `xml:"tags>tag"`
+	Notes      []Note   `xml:"notes>note"`
+	Task       []Task   `xml:"task"`
 }
 
 type Priority string
