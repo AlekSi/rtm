@@ -43,6 +43,13 @@ const (
 
 type Args map[string]string
 
+type xmlResponse struct {
+	XMLName xml.Name `xml:"rsp"`
+	Stat    string   `xml:"stat,attr"`
+	Err     *Error   `xml:"err"`
+	Inner   []byte   `xml:",innerxml"`
+}
+
 type Client struct {
 	APIKey     string
 	APISecret  string
@@ -161,7 +168,11 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 	}
 
 	if c.recordTestdata {
-		filename := filepath.Join("testdata", "tmp-"+method+".xml")
+		ext := format
+		if format == "" || format == "rest" {
+			ext = "xml"
+		}
+		filename := filepath.Join("testdata", "tmp-"+method+"."+ext)
 		s := string(b)
 		for _, p := range []string{c.APIKey, c.APISecret, c.AuthToken} {
 			if p != "" {
@@ -176,22 +187,8 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 	return b, nil
 }
 
-type Error struct {
-	Code int    `xml:"code,attr"`
-	Msg  string `xml:"msg,attr"`
-}
-
-func (e *Error) Error() string {
-	return fmt.Sprintf("%d: %s", e.Code, e.Msg)
-}
-
-func unmarshalRsp(b []byte) ([]byte, error) {
-	var rsp struct {
-		XMLName xml.Name `xml:"rsp"`
-		Stat    string   `xml:"stat,attr"`
-		Err     *Error   `xml:"err"`
-		Inner   []byte   `xml:",innerxml"`
-	}
+func unmarshalXMLRsp(b []byte) ([]byte, error) {
+	var rsp xmlResponse
 	err := xml.Unmarshal(b, &rsp)
 	switch {
 	case err != nil:
@@ -211,7 +208,7 @@ func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, er
 		return nil, err
 	}
 
-	return unmarshalRsp(b)
+	return unmarshalXMLRsp(b)
 }
 
 // check interfaces
