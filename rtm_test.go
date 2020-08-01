@@ -78,6 +78,8 @@ func TestMain(m *testing.M) {
 	var key, secret, token string
 	var getCredsOnce sync.Once
 	GetClient = func(t testing.TB) *Client {
+		t.Helper()
+
 		if testing.Short() {
 			t.Skip("-short passed, skipping integration test")
 		}
