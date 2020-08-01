@@ -8,6 +8,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func parseDuration(tb testing.TB, s string) Duration {
+	tb.Helper()
+
+	var d Duration
+	err := d.UnmarshalText([]byte(s))
+	require.NoError(tb, err)
+	return d
+}
+
 func TestDuration(t *testing.T) {
 	for text, expected := range map[string]time.Duration{
 		"":        0,

@@ -8,6 +8,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func parseTime(tb testing.TB, s string) Time {
+	tb.Helper()
+
+	var t Time
+	err := t.UnmarshalText([]byte(s))
+	require.NoError(tb, err)
+	return t
+}
+
 func TestTime(t *testing.T) {
 	for text, expected := range map[string]time.Time{
 		"2019-01-20T09:20:58Z": time.Date(2019, 1, 20, 9, 20, 58, 0, time.UTC),

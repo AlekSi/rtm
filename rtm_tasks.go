@@ -44,6 +44,17 @@ type TasksGetListParams struct {
 	LastSync Time
 }
 
+type tasksGetListResponseList struct {
+	XMLName    xml.Name     `xml:"list"`
+	ID         string       `xml:"id,attr"`
+	TaskSeries []TaskSeries `xml:"taskseries"`
+}
+
+type tasksGetListResponse struct {
+	XMLName xml.Name                   `xml:"tasks"`
+	Lists   []tasksGetListResponseList `xml:"list"`
+}
+
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.getList.rtm
 func (t *TasksService) GetList(ctx context.Context, params *TasksGetListParams) (map[string][]TaskSeries, error) {
 	args := make(Args)
@@ -64,14 +75,7 @@ func (t *TasksService) GetList(ctx context.Context, params *TasksGetListParams) 
 		return nil, err
 	}
 
-	var resp struct {
-		XMLName xml.Name `xml:"tasks"`
-		Lists   []struct {
-			XMLName    xml.Name     `xml:"list"`
-			ID         string       `xml:"id,attr"`
-			TaskSeries []TaskSeries `xml:"taskseries"`
-		} `xml:"list"`
-	}
+	var resp tasksGetListResponse
 	if err = xml.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
