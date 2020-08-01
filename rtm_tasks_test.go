@@ -88,9 +88,7 @@ func TestTasks(t *testing.T) {
 		})
 	})
 
-	t.Run("AddDecode", func(t *testing.T) {
-		var actual tasksAddResponse
-		unmarshalTestdataFile(t, "rtm.tasks.add.xml", &actual)
+	t.Run("Add", func(t *testing.T) {
 		expected := tasksAddResponse{
 			Transaction: &Transaction{
 				XMLName: xml.Name{Local: "transaction"},
@@ -113,26 +111,31 @@ func TestTasks(t *testing.T) {
 				},
 			},
 		}
-		assert.Equal(t, expected, actual)
-	})
 
-	t.Run("AddDelete", func(t *testing.T) {
-		timeline, err := GetClient(t).Timelines().Create(Ctx)
-		require.NoError(t, err)
-
-		task, err := GetClient(t).Tasks().Add(Ctx, timeline, TasksAddParams{
-			ListID: "43911488",
-			Name:   t.Name(),
+		t.Run("Decode", func(t *testing.T) {
+			var actual tasksAddResponse
+			unmarshalTestdataFile(t, "rtm.tasks.add.xml", &actual)
+			assert.Equal(t, expected, actual)
 		})
-		require.NoError(t, err)
-		t.Log(task)
-		require.NotEmpty(t, task.Task)
 
-		err = GetClient(t).Tasks().Delete(Ctx, timeline, TasksDeleteParams{
-			ListID:       "43911488",
-			TaskSeriesID: task.ID,
-			TaskID:       task.Task[0].ID,
+		t.Run("Real", func(t *testing.T) {
+			timeline, err := GetClient(t).Timelines().Create(Ctx)
+			require.NoError(t, err)
+
+			task, err := GetClient(t).Tasks().Add(Ctx, timeline, TasksAddParams{
+				ListID: "43911488",
+				Name:   t.Name(),
+			})
+			require.NoError(t, err)
+			t.Log(task)
+			require.NotEmpty(t, task.Task)
+
+			err = GetClient(t).Tasks().Delete(Ctx, timeline, TasksDeleteParams{
+				ListID:       "43911488",
+				TaskSeriesID: task.ID,
+				TaskID:       task.Task[0].ID,
+			})
+			require.NoError(t, err)
 		})
-		require.NoError(t, err)
 	})
 }
