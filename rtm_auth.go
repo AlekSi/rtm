@@ -3,7 +3,6 @@ package rtm
 import (
 	"context"
 	"encoding/json"
-	"encoding/xml"
 )
 
 type AuthService struct {
@@ -63,36 +62,38 @@ func (a *AuthService) checkTokenUnmarshal(b []byte) (*AuthInfo, error) {
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.auth.getFrob.rtm
 func (a *AuthService) GetFrob(ctx context.Context) (string, error) {
-	b, err := a.client.Call(ctx, "rtm.auth.getFrob", nil)
+	b, err := a.client.CallJSON(ctx, "rtm.auth.getFrob", nil)
 	if err != nil {
 		return "", err
 	}
 
+	return a.getFrobUnmarshal(b)
+}
+
+func (a *AuthService) getFrobUnmarshal(b []byte) (string, error) {
 	var resp struct {
-		XMLName xml.Name `xml:"frob"`
-		Frob    string   `xml:",chardata"`
+		Rsp struct {
+			Frob string `json:"frob"`
+		} `json:"rsp"`
 	}
-	if err = xml.Unmarshal(b, &resp); err != nil {
+	if err := json.Unmarshal(b, &resp); err != nil {
 		return "", err
 	}
 
-	return resp.Frob, nil
+	return resp.Rsp.Frob, nil
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.auth.getToken.rtm
-func (a *AuthService) GetToken(ctx context.Context, frob string) (string, error) {
-	b, err := a.client.Call(ctx, "rtm.auth.getToken", Args{"frob": frob})
+func (a *AuthService) GetToken(ctx context.Context, frob string) (*AuthInfo, error) {
+	b, err := a.client.CallJSON(ctx, "rtm.auth.getToken", Args{"frob": frob})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	var resp struct {
-		XMLName xml.Name `xml:"auth"`
-		Token   string   `xml:"token"`
-	}
-	if err = xml.Unmarshal(b, &resp); err != nil {
-		return "", err
-	}
+	return a.getTokenUnmarshal(b)
+}
 
-	return resp.Token, nil
+func (a *AuthService) getTokenUnmarshal(b []byte) (*AuthInfo, error) {
+	// responce is exactly the same
+	return a.checkTokenUnmarshal(b)
 }

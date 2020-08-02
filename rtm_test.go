@@ -47,7 +47,10 @@ func getCreds(t testing.TB) (key, secret, token string) {
 	log.Printf("Visit this URL: %s", u)
 
 	for i := 0; i < 3; i++ {
-		token, _ = client.Auth().GetToken(Ctx, frob)
+		info, _ := client.Auth().GetToken(Ctx, frob)
+		if info != nil {
+			token = info.Token
+		}
 		if token != "" {
 			break
 		}
