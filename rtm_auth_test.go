@@ -43,6 +43,12 @@ func TestAuth(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, expected, actual)
 		})
+
+		t.Run("Real", func(t *testing.T) {
+			actual, err := GetClient(t).Auth().GetFrob(Ctx)
+			require.NoError(t, err)
+			assert.NotEmpty(t, actual)
+		})
 	})
 
 	t.Run("GetToken", func(t *testing.T) {
