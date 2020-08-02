@@ -9,6 +9,8 @@ import (
 )
 
 func TestTasks(t *testing.T) {
+	t.Skip("TODO")
+
 	t.Run("GetList", func(t *testing.T) {
 		expected := tasksGetListResponse{
 			XMLName: xml.Name{Local: "tasks"},

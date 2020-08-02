@@ -224,7 +224,7 @@ func (c *Client) CallJSON(ctx context.Context, method string, args Args) ([]byte
 
 // TODO rename to callUnmarshal
 func (c *Client) callJSONUnmarshal(b []byte) ([]byte, error) {
-	var res struct {
+	var resp struct {
 		Rsp struct {
 			Stat string `json:"stat"`
 			Err  *struct {
@@ -233,18 +233,18 @@ func (c *Client) callJSONUnmarshal(b []byte) ([]byte, error) {
 			} `json:"err"`
 		} `json:"rsp"`
 	}
-	err := json.Unmarshal(b, &res)
+	err := json.Unmarshal(b, &resp)
 	switch {
 	case err != nil:
 		return nil, err
-	case res.Rsp.Err != nil:
-		code, _ := strconv.Atoi(res.Rsp.Err.Code)
+	case resp.Rsp.Err != nil:
+		code, _ := strconv.Atoi(resp.Rsp.Err.Code)
 		return nil, &Error{
 			Code: code,
-			Msg:  res.Rsp.Err.Msg,
+			Msg:  resp.Rsp.Err.Msg,
 		}
-	case res.Rsp.Stat != "ok":
-		return nil, fmt.Errorf("unexpected stat %q", res.Rsp.Stat)
+	case resp.Rsp.Stat != "ok":
+		return nil, fmt.Errorf("unexpected stat %q", resp.Rsp.Stat)
 	default:
 		return b, nil
 	}

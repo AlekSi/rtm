@@ -27,7 +27,7 @@ func (r *ReflectionService) GetMethodInfo(ctx context.Context, method string) (*
 }
 
 func (r *ReflectionService) getMethodInfoUnmarshal(b []byte) (*MethodInfo, error) {
-	var res struct {
+	var resp struct {
 		Rsp struct {
 			Method struct {
 				Name       string `json:"name"`
@@ -35,14 +35,14 @@ func (r *ReflectionService) getMethodInfoUnmarshal(b []byte) (*MethodInfo, error
 			} `json:"method"`
 		} `json:"rsp"`
 	}
-	if err := json.Unmarshal(b, &res); err != nil {
+	if err := json.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
 
-	needsLogin, _ := strconv.ParseBool(res.Rsp.Method.NeedsLogin)
+	needsLogin, _ := strconv.ParseBool(resp.Rsp.Method.NeedsLogin)
 
 	return &MethodInfo{
-		Name:       res.Rsp.Method.Name,
+		Name:       resp.Rsp.Method.Name,
 		NeedsLogin: needsLogin,
 	}, nil
 }
@@ -58,18 +58,18 @@ func (r *ReflectionService) GetMethods(ctx context.Context) ([]string, error) {
 }
 
 func (r *ReflectionService) getMethodsUnmarshal(b []byte) ([]string, error) {
-	var res struct {
+	var resp struct {
 		Rsp struct {
 			Methods struct {
 				Method []string `json:"method"`
 			} `json:"methods"`
 		} `json:"rsp"`
 	}
-	if err := json.Unmarshal(b, &res); err != nil {
+	if err := json.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
 
-	sort.Strings(res.Rsp.Methods.Method)
+	sort.Strings(resp.Rsp.Methods.Method)
 
-	return res.Rsp.Methods.Method, nil
+	return resp.Rsp.Methods.Method, nil
 }
