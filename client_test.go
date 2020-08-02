@@ -8,20 +8,34 @@ import (
 )
 
 func TestClient(t *testing.T) {
-	t.Run("Call", func(t *testing.T) {
-		t.Run("Ok", func(t *testing.T) {
-			client := GetClient(t)
-			b, err := client.Call(Ctx, "rtm.test.echo", Args{"foo": "bar"})
+	t.Run("NoError", func(t *testing.T) {
+		t.Run("Unmarshal", func(t *testing.T) {
+			b := readTestdataFile(t, "rtm.test.echo.json")
+			_, err := new(Client).callJSONUnmarshal(b)
 			require.NoError(t, err)
-			assert.Contains(t, string(b), `<foo>bar</foo>`)
 		})
 
-		t.Run("Error", func(t *testing.T) {
-			client := GetClient(t)
-			b, err := client.Call(Ctx, "no.such.method", nil)
-			assert.Equal(t, &Error{Code: 112, Msg: `Method "no.such.method" not found`}, err)
-			assert.EqualError(t, err, `112: Method "no.such.method" not found`)
-			assert.Empty(t, b)
+		t.Run("Real", func(t *testing.T) {
+			_, err := GetClient(t).CallJSON(Ctx, "rtm.test.echo", Args{"foo": "bar"})
+			require.NoError(t, err)
+		})
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		expected := &Error{
+			Code: 112,
+			Msg:  `Method "no.such.method" not found`,
+		}
+
+		t.Run("Unmarshal", func(t *testing.T) {
+			b := readTestdataFile(t, "no.such.method.json")
+			_, actual := new(Client).callJSONUnmarshal(b)
+			assert.Equal(t, expected, actual)
+		})
+
+		t.Run("Real", func(t *testing.T) {
+			_, actual := GetClient(t).CallJSON(Ctx, "no.such.method", nil)
+			assert.Equal(t, expected, actual)
 		})
 	})
 }

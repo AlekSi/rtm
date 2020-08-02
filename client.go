@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -218,18 +219,30 @@ func (c *Client) CallJSON(ctx context.Context, method string, args Args) ([]byte
 		return nil, err
 	}
 
+	return c.callJSONUnmarshal(b)
+}
+
+// TODO rename to callUnmarshal
+func (c *Client) callJSONUnmarshal(b []byte) ([]byte, error) {
 	var res struct {
 		Rsp struct {
 			Stat string `json:"stat"`
-			Err  *Error `json:"err"`
+			Err  *struct {
+				Code string `json:"code"`
+				Msg  string `json:"msg"`
+			} `json:"err"`
 		} `json:"rsp"`
 	}
-	err = json.Unmarshal(b, &res)
+	err := json.Unmarshal(b, &res)
 	switch {
 	case err != nil:
 		return nil, err
 	case res.Rsp.Err != nil:
-		return nil, res.Rsp.Err
+		code, _ := strconv.Atoi(res.Rsp.Err.Code)
+		return nil, &Error{
+			Code: code,
+			Msg:  res.Rsp.Err.Msg,
+		}
 	case res.Rsp.Stat != "ok":
 		return nil, fmt.Errorf("unexpected stat %q", res.Rsp.Stat)
 	default:
