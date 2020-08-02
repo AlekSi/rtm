@@ -9,15 +9,25 @@ import (
 )
 
 func TestTasks(t *testing.T) {
-	t.Skip("TODO")
-
 	t.Run("GetList", func(t *testing.T) {
-		expected := tasksGetListResponse{
-			XMLName: xml.Name{Local: "tasks"},
-			Lists: []tasksGetListResponseList{{
-				XMLName: xml.Name{Local: "list"},
-				ID:      "43911488",
-				TaskSeries: []TaskSeries{{
+		expected := map[string][]TaskSeries{
+			"43911488": {
+				{
+					ID:       "358441583",
+					Created:  parseTime(t, "2018-08-05T09:30:56Z"),
+					Modified: parseTime(t, "2018-08-05T13:42:43Z"),
+					Name:     "Задача 2",
+					Source:   "js",
+					Task: []Task{{
+						ID:    "622345833",
+						Due:   parseTime(t, "2018-08-05T21:00:00Z"),
+						Added: parseTime(t, "2018-08-05T09:30:56Z"),
+						// Completed: parseTime(t, "2018-08-05T13:42:43Z"),
+						Priority: "2",
+						Estimate: parseDuration(t, "PT1H12M"),
+						Start:    parseTime(t, "2018-08-04T21:00:00Z"),
+					}},
+				}, {
 					ID:         "358441579",
 					Created:    parseTime(t, "2018-08-05T09:30:53Z"),
 					Modified:   parseTime(t, "2020-08-01T13:05:09Z"),
@@ -25,59 +35,57 @@ func TestTasks(t *testing.T) {
 					Source:     "js",
 					URL:        "https://github.com/AlekSi/rtm",
 					LocationID: "1265394",
-					Tags:       []string{"tag1", "tag2"},
-					Notes: []Note{{
-						ID:       "81657666",
-						Created:  parseTime(t, "2020-08-01T13:05:09Z"),
-						Modified: parseTime(t, "2020-08-01T13:05:09Z"),
-						Text:     "Note 2",
-					}, {
-						ID:       "81657665",
-						Created:  parseTime(t, "2020-08-01T13:05:05Z"),
-						Modified: parseTime(t, "2020-08-01T13:05:05Z"),
-						Text:     "Note 1",
-					}},
+					// Tags:       []string{"tag1", "tag2"},
+					// Notes: []Note{{
+					// 	ID:       "81657666",
+					// 	Created:  parseTime(t, "2020-08-01T13:05:09Z"),
+					// 	Modified: parseTime(t, "2020-08-01T13:05:09Z"),
+					// 	Text:     "Note 2",
+					// }, {
+					// 	ID:       "81657665",
+					// 	Created:  parseTime(t, "2020-08-01T13:05:05Z"),
+					// 	Modified: parseTime(t, "2020-08-01T13:05:05Z"),
+					// 	Text:     "Note 1",
+					// }},
 					Task: []Task{{
-						ID:           "622345829",
-						Due:          parseTime(t, "2018-08-06T20:30:00Z"),
-						HasDueTime:   true,
-						Added:        parseTime(t, "2018-08-05T09:30:53Z"),
-						Priority:     "N",
-						Start:        parseTime(t, "2018-08-04T21:30:00Z"),
-						HasStartTime: true,
+						ID:  "622345829",
+						Due: parseTime(t, "2018-08-06T20:30:00Z"),
+						// HasDueTime: true,
+						Added:    parseTime(t, "2018-08-05T09:30:53Z"),
+						Priority: "N",
+						Start:    parseTime(t, "2018-08-04T21:30:00Z"),
+						// HasStartTime: true,
 					}},
-				}, {
-					ID:       "358441583",
-					Created:  parseTime(t, "2018-08-05T09:30:56Z"),
-					Modified: parseTime(t, "2018-08-05T13:42:43Z"),
-					Name:     "Задача 2",
-					Source:   "js",
-					Task: []Task{{
-						ID:        "622345833",
-						Due:       parseTime(t, "2018-08-05T21:00:00Z"),
-						Added:     parseTime(t, "2018-08-05T09:30:56Z"),
-						Completed: parseTime(t, "2018-08-05T13:42:43Z"),
-						Priority:  "2",
-						Estimate:  parseDuration(t, "PT1H12M"),
-						Start:     parseTime(t, "2018-08-04T21:00:00Z"),
-					}},
-				}},
-			}},
+				},
+			},
 		}
 
-		t.Run("Decode", func(t *testing.T) {
-			var actual tasksGetListResponse
-			unmarshalTestdataFile(t, "rtm.tasks.getList.xml", &actual)
+		t.Run("Unmarshal", func(t *testing.T) {
+			b := readTestdataFile(t, "rtm.tasks.getList.json")
+			actual, err := new(Client).Tasks().client.Tasks().getListUnmarshal(b)
+			require.NoError(t, err)
 			assert.Equal(t, expected, actual)
 		})
 
 		t.Run("Real", func(t *testing.T) {
+			t.Skip("TODO")
+
+			actual, err := GetClient(t).Tasks().GetList(Ctx, &TasksGetListParams{
+				ListID: "43911488",
+			})
+			require.NoError(t, err)
+			assert.Equal(t, expected, actual)
+		})
+
+		t.Run("Real", func(t *testing.T) {
+			t.Skip("TODO")
+
 			params := &TasksGetListParams{
 				ListID: "43911488",
 			}
 			actual, err := GetClient(t).Tasks().GetList(Ctx, params)
 			require.NoError(t, err)
-			assert.Equal(t, expected.toMap(), actual)
+			assert.Equal(t, expected, actual)
 
 			// for _, series := range expected {
 			// 	for _, s := range series {
@@ -91,6 +99,8 @@ func TestTasks(t *testing.T) {
 	})
 
 	t.Run("Add", func(t *testing.T) {
+		t.Skip("TODO")
+
 		expected := tasksAddResponse{
 			Transaction: &Transaction{
 				XMLName: xml.Name{Local: "transaction"},
@@ -100,14 +110,14 @@ func TestTasks(t *testing.T) {
 				XMLName: xml.Name{Local: "list"},
 				ListID:  "43911488",
 				TaskSeries: TaskSeries{
-					ID:       "403924673",
-					Created:  parseTime(t, "2020-01-14T06:23:58Z"),
-					Modified: parseTime(t, "2020-01-14T06:23:58Z"),
-					Name:     "TestTasks/AddDelete",
-					Source:   "api:XXX",
+					ID: "403924673",
+					// Created:  parseTime(t, "2020-01-14T06:23:58Z"),
+					// Modified: parseTime(t, "2020-01-14T06:23:58Z"),
+					Name:   "TestTasks/AddDelete",
+					Source: "api:XXX",
 					Task: []Task{{
-						ID:       "706419831",
-						Added:    parseTime(t, "2020-01-14T06:23:58Z"),
+						ID: "706419831",
+						// Added:    parseTime(t, "2020-01-14T06:23:58Z"),
 						Priority: "N",
 					}},
 				},

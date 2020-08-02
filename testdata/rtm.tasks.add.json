@@ -1,0 +1,42 @@
+{
+    "rsp": {
+        "stat": "ok",
+        "transaction": {
+            "id": "6024424839",
+            "undoable": "0"
+        },
+        "list": {
+            "id": "43911488",
+            "taskseries": [
+                {
+                    "id": "423334316",
+                    "created": "2020-08-02T15:06:01Z",
+                    "modified": "2020-08-02T15:06:01Z",
+                    "name": "TestTasks/Add/Real",
+                    "source": "api:XXX",
+                    "url": "",
+                    "location_id": "",
+                    "parent_task_id": "",
+                    "tags": [],
+                    "participants": [],
+                    "notes": [],
+                    "task": [
+                        {
+                            "id": "743473487",
+                            "due": "",
+                            "has_due_time": "0",
+                            "added": "2020-08-02T15:06:01Z",
+                            "completed": "",
+                            "deleted": "",
+                            "priority": "N",
+                            "postponed": "0",
+                            "estimate": "",
+                            "start": "",
+                            "has_start_time": "0"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

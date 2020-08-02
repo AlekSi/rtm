@@ -2,6 +2,7 @@ package rtm
 
 import (
 	"context"
+	"encoding/json"
 	"encoding/xml"
 )
 
@@ -10,67 +11,37 @@ type TasksService struct {
 }
 
 type TaskSeries struct {
-	ID         string   `xml:"id,attr"`
-	Created    Time     `xml:"created,attr"`
-	Modified   Time     `xml:"modified,attr"`
-	Name       string   `xml:"name,attr"`
-	Source     string   `xml:"source,attr"`
-	URL        string   `xml:"url,attr"`
-	LocationID string   `xml:"location_id,attr"`
-	Tags       []string `xml:"tags>tag"`
-	Notes      []Note   `xml:"notes>note"`
-	Task       []Task   `xml:"task"`
+	ID         string
+	Created    Time
+	Modified   Time
+	Name       string
+	Source     string
+	URL        string
+	LocationID string
+	Tags       []string
+	// Notes      []Note
+	Task []Task
 }
 
 type Priority string
 
 type Task struct {
-	ID         string `xml:"id,attr"`
-	Due        Time   `xml:"due,attr"`
-	HasDueTime bool   `xml:"has_due_time,attr"`
-	Added      Time   `xml:"added,attr"`
-	Completed  Time   `xml:"completed,attr,omitempty"`
-	// Deleted      string    `xml:"deleted,attr"`
-	Priority     Priority `xml:"priority,attr"`
-	Estimate     Duration `xml:"estimate,attr"`
-	Start        Time     `xml:"start,attr"`
-	HasStartTime bool     `xml:"has_start_time,attr"`
+	ID           string
+	Due          Time
+	HasDueTime   bool
+	Added        Time
+	Completed    Time
+	Deleted      string
+	Priority     Priority
+	Estimate     Duration
+	Start        Time
+	HasStartTime bool
 }
 
 type TasksGetListParams struct {
 	ListID   string
 	Filter   string
 	LastSync Time
-}
-
-type tasksGetListResponseList struct {
-	XMLName    xml.Name     `xml:"list"`
-	ID         string       `xml:"id,attr"`
-	TaskSeries []TaskSeries `xml:"taskseries"`
-}
-
-type tasksGetListResponse struct {
-	XMLName xml.Name                   `xml:"tasks"`
-	Lists   []tasksGetListResponseList `xml:"list"`
-}
-
-func (t *tasksGetListResponse) toMap() map[string][]TaskSeries {
-	res := make(map[string][]TaskSeries, len(t.Lists))
-	for _, list := range t.Lists {
-		// for i, series := range list.TaskSeries {
-		// 	for j, task := range series.Task {
-		// 		if !task.HasDueTime {
-		// 			list.TaskSeries[i].Task[j].Due = task.Due.withoutTime()
-		// 		}
-		// 		if !task.HasStartTime {
-		// 			list.TaskSeries[i].Task[j].Start = task.Start.withoutTime()
-		// 		}
-		// 	}
-		// }
-		res[list.ID] = list.TaskSeries
-	}
-
-	return res
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.getList.rtm
@@ -88,16 +59,96 @@ func (t *TasksService) GetList(ctx context.Context, params *TasksGetListParams) 
 		}
 	}
 
-	b, err := t.client.Call(ctx, "rtm.tasks.getList", args)
+	b, err := t.client.CallJSON(ctx, "rtm.tasks.getList", args)
 	if err != nil {
 		return nil, err
 	}
 
-	var resp tasksGetListResponse
-	if err = xml.Unmarshal(b, &resp); err != nil {
+	return t.getListUnmarshal(b)
+}
+
+func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, error) {
+	var resp struct {
+		Rsp struct {
+			Tasks struct {
+				Rev  string `json:"rev"`
+				List []struct {
+					ID         string `json:"id"`
+					TaskSeries []struct {
+						ID         string `json:"id"`
+						Created    Time   `json:"created"`
+						Modified   Time   `json:"modified"`
+						Name       string `json:"name"`
+						Source     string `json:"source"`
+						URL        string `json:"url"`
+						LocationID string `json:"location_id"`
+						// Tags       []string `json:"tags>tag"`
+						// Notes      []Note   `json:"notes>note"`
+						Task []struct {
+							ID  string `json:"id"`
+							Due Time   `json:"due"`
+							// HasDueTime bool `json:"has_due_time"`
+							Added Time `json:"added"`
+							// Completed Time `json:"completed"`
+							// Deleted      string    `json:"deleted"`
+							Priority Priority `json:"priority"`
+							Estimate Duration `json:"estimate"`
+							Start    Time     `json:"start"`
+							// HasStartTime bool `json:"has_start_time"`
+						} `json:"task"`
+					} `json:"taskseries"`
+				} `json:"list"`
+			} `json:"tasks"`
+		} `json:"rsp"`
+	}
+
+	if err := json.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
-	return resp.toMap(), nil
+
+	res := make(map[string][]TaskSeries, len(resp.Rsp.Tasks.List))
+	for _, l := range resp.Rsp.Tasks.List {
+		// for i, series := range list.TaskSeries {
+		// 	for j, task := range series.Task {
+		// 		if !task.HasDueTime {
+		// 			list.TaskSeries[i].Task[j].Due = task.Due.withoutTime()
+		// 		}
+		// 		if !task.HasStartTime {
+		// 			list.TaskSeries[i].Task[j].Start = task.Start.withoutTime()
+		// 		}
+		// 	}
+		// }
+
+		taskSeries := make([]TaskSeries, len(l.TaskSeries))
+		for i, ts := range l.TaskSeries {
+			tasks := make([]Task, len(ts.Task))
+			for j, t := range ts.Task {
+				tasks[j] = Task{
+					ID:    t.ID,
+					Due:   t.Due,
+					Added: t.Added,
+					// Completed: t.Completed,
+					Priority: t.Priority,
+					Estimate: t.Estimate,
+					Start:    t.Start,
+				}
+			}
+
+			taskSeries[i] = TaskSeries{
+				ID:         ts.ID,
+				Created:    ts.Created,
+				Modified:   ts.Modified,
+				Name:       ts.Name,
+				Source:     ts.Source,
+				URL:        ts.URL,
+				LocationID: ts.LocationID,
+				Task:       tasks,
+			}
+		}
+		res[l.ID] = taskSeries
+	}
+
+	return res, nil
 }
 
 type TasksAddParams struct {
@@ -108,14 +159,14 @@ type TasksAddParams struct {
 }
 
 type tasksAddResponseList struct {
-	XMLName    xml.Name   `xml:"list"`
-	ListID     string     `xml:"id,attr"`
-	TaskSeries TaskSeries `xml:"taskseries"`
+	XMLName    xml.Name   `json:"list"`
+	ListID     string     `json:"id"`
+	TaskSeries TaskSeries `json:"taskseries"`
 }
 
 type tasksAddResponse struct {
-	Transaction          *Transaction         `xml:"transaction"`
-	TasksAddResponseList tasksAddResponseList `xml:"list"`
+	Transaction          *Transaction         `json:"transaction"`
+	TasksAddResponseList tasksAddResponseList `json:"list"`
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.add.rtm
@@ -134,7 +185,7 @@ func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAdd
 		args["parent_task_id"] = params.ParentTaskID
 	}
 
-	b, err := t.client.Call(ctx, "rtm.tasks.add", args)
+	b, err := t.client.CallJSON(ctx, "rtm.tasks.add", args)
 	if err != nil {
 		return nil, err
 	}
@@ -162,6 +213,6 @@ func (t *TasksService) Delete(ctx context.Context, timeline string, params Tasks
 		"task_id":       params.TaskID,
 	}
 
-	_, err := t.client.Call(ctx, "rtm.tasks.delete.rtm", args)
+	_, err := t.client.CallJSON(ctx, "rtm.tasks.delete.rtm", args)
 	return err
 }
