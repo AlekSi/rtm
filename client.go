@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -200,6 +201,7 @@ func unmarshalXMLRsp(b []byte) ([]byte, error) {
 	}
 }
 
+// TODO remove
 func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, error) {
 	b, err := c.post(ctx, method, args, "")
 	if err != nil {
@@ -207,6 +209,32 @@ func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, er
 	}
 
 	return unmarshalXMLRsp(b)
+}
+
+// TODO rename to Call
+func (c *Client) CallJSON(ctx context.Context, method string, args Args) ([]byte, error) {
+	b, err := c.post(ctx, method, args, "json")
+	if err != nil {
+		return nil, err
+	}
+
+	var res struct {
+		Rsp struct {
+			Stat string `json:"stat"`
+			Err  *Error `json:"err"`
+		} `json:"rsp"`
+	}
+	err = json.Unmarshal(b, &res)
+	switch {
+	case err != nil:
+		return nil, err
+	case res.Rsp.Err != nil:
+		return nil, res.Rsp.Err
+	case res.Rsp.Stat != "ok":
+		return nil, fmt.Errorf("unexpected stat %q", res.Rsp.Stat)
+	default:
+		return b, nil
+	}
 }
 
 // check interfaces

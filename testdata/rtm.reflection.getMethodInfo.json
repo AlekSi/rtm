@@ -1,0 +1,66 @@
+{
+    "rsp": {
+        "stat": "ok",
+        "method": {
+            "name": "rtm.test.login",
+            "needslogin": "1",
+            "needssigning": "1",
+            "requiredperms": "1",
+            "description": "A testing method which checks if the caller is logged in.\n <b>This method call must be signed.</b>",
+            "response": "<user id=\"987654321\">\n  <username>bob</username>\n</user>",
+            "arguments": {
+                "argument": [
+                    {
+                        "name": "api_key",
+                        "optional": "0",
+                        "$t": "Your API application key. <a href=\"/services/api/keys.rtm\">See here</a> for more details."
+                    }
+                ]
+            },
+            "errors": {
+                "error": [
+                    {
+                        "code": "96",
+                        "message": "Invalid signature",
+                        "$t": "The passed signature was invalid."
+                    },
+                    {
+                        "code": "97",
+                        "message": "Missing signature",
+                        "$t": "The call required signing but no signature was sent."
+                    },
+                    {
+                        "code": "98",
+                        "message": "Login failed / Invalid auth token",
+                        "$t": "The login details or auth token passed were invalid."
+                    },
+                    {
+                        "code": "100",
+                        "message": "Invalid API Key",
+                        "$t": "The API key passed was not valid or has expired."
+                    },
+                    {
+                        "code": "105",
+                        "message": "Service currently unavailable",
+                        "$t": "The requested service is temporarily unavailable."
+                    },
+                    {
+                        "code": "114",
+                        "message": "Invalid SOAP envelope",
+                        "$t": "The SOAP envelope sent in the request could not be parsed."
+                    },
+                    {
+                        "code": "115",
+                        "message": "Invalid XML-RPC Method Call",
+                        "$t": "The XML-RPC request document could not be parsed."
+                    },
+                    {
+                        "code": "120",
+                        "message": "Method not valid for requested version",
+                        "$t": "The requested method is not compatible with the requested version."
+                    }
+                ]
+            }
+        }
+    }
+}
