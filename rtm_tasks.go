@@ -95,8 +95,8 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 							ID  string `json:"id"`
 							Due Time   `json:"due"`
 							// HasDueTime bool `json:"has_due_time"`
-							Added Time `json:"added"`
-							// Completed Time `json:"completed"`
+							Added     Time `json:"added"`
+							Completed Time `json:"completed"`
 							// Deleted      string    `json:"deleted"`
 							Priority Priority `json:"priority"`
 							Estimate Duration `json:"estimate"`
@@ -131,13 +131,13 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 			tasks := make([]Task, len(ts.Task))
 			for j, t := range ts.Task {
 				tasks[j] = Task{
-					ID:    t.ID,
-					Due:   t.Due,
-					Added: t.Added,
-					// Completed: t.Completed,
-					Priority: t.Priority,
-					Estimate: t.Estimate,
-					Start:    t.Start,
+					ID:        t.ID,
+					Due:       t.Due,
+					Added:     t.Added,
+					Completed: t.Completed,
+					Priority:  t.Priority,
+					Estimate:  t.Estimate,
+					Start:     t.Start,
 				}
 			}
 
