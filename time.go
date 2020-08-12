@@ -37,16 +37,16 @@ func (t *Time) UnmarshalText(data []byte) error {
 	return nil
 }
 
-// hasTime returns false if this instance contains only date without time.
-func (t Time) hasTime() bool {
-	hour, min, sec := t.Clock()
-	return hour != 0 || min != 0 || sec != 0
-}
+// // hasTime returns false if this instance contains only date without time.
+// func (t Time) hasTime() bool {
+// 	hour, min, sec := t.Clock()
+// 	return hour != 0 || min != 0 || sec != 0
+// }
 
-func (t Time) withoutTime() Time {
-	year, month, day := t.Date()
-	return Time{time.Date(year, month, day, 0, 0, 0, 0, time.UTC)}
-}
+// func (t Time) withoutTime() Time {
+// 	year, month, day := t.Date()
+// 	return Time{time.Date(year, month, day, 0, 0, 0, 0, time.UTC)}
+// }
 
 // check interfaces
 var (

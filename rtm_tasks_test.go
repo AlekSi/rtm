@@ -35,7 +35,7 @@ func TestTasks(t *testing.T) {
 					Source:     "js",
 					URL:        "https://github.com/AlekSi/rtm",
 					LocationID: "1265394",
-					// Tags:       []string{"tag1", "tag2"},
+					Tags:       []string{"tag1", "tag2"},
 					Notes: []Note{{
 						ID:       "81657666",
 						Created:  parseTime(t, "2020-08-01T13:05:09Z"),
