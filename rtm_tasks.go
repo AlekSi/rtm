@@ -38,7 +38,7 @@ type Task struct {
 	HasDueTime   bool
 	Added        Time
 	Completed    Time
-	Deleted      string
+	Deleted      Time
 	Priority     Priority
 	Estimate     Duration
 	Start        Time
@@ -92,16 +92,16 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 						Tags       json.RawMessage `json:"tags"`
 						Notes      json.RawMessage `json:"notes"`
 						Task       []struct {
-							ID  string `json:"id"`
-							Due Time   `json:"due"`
-							// HasDueTime bool `json:"has_due_time"`
-							Added     Time `json:"added"`
-							Completed Time `json:"completed"`
-							// Deleted      string    `json:"deleted"`
-							Priority Priority `json:"priority"`
-							Estimate Duration `json:"estimate"`
-							Start    Time     `json:"start"`
-							// HasStartTime bool `json:"has_start_time"`
+							ID           string   `json:"id"`
+							Due          Time     `json:"due"`
+							HasDueTime   rtmBool  `json:"has_due_time"`
+							Added        Time     `json:"added"`
+							Completed    Time     `json:"completed"`
+							Deleted      Time     `json:"deleted"`
+							Priority     Priority `json:"priority"`
+							Estimate     Duration `json:"estimate"`
+							Start        Time     `json:"start"`
+							HasStartTime rtmBool  `json:"has_start_time"`
 						} `json:"task"`
 					} `json:"taskseries"`
 				} `json:"list"`
@@ -131,13 +131,16 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 			tasks := make([]Task, len(ts.Task))
 			for j, t := range ts.Task {
 				tasks[j] = Task{
-					ID:        t.ID,
-					Due:       t.Due,
-					Added:     t.Added,
-					Completed: t.Completed,
-					Priority:  t.Priority,
-					Estimate:  t.Estimate,
-					Start:     t.Start,
+					ID:           t.ID,
+					Due:          t.Due,
+					HasDueTime:   bool(t.HasDueTime),
+					Added:        t.Added,
+					Completed:    t.Completed,
+					Deleted:      t.Deleted,
+					Priority:     t.Priority,
+					Estimate:     t.Estimate,
+					Start:        t.Start,
+					HasStartTime: bool(t.HasStartTime),
 				}
 			}
 
