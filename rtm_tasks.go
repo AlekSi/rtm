@@ -10,6 +10,13 @@ type TasksService struct {
 	client *Client
 }
 
+type Note struct {
+	ID       string
+	Created  Time
+	Modified Time
+	Text     string
+}
+
 type TaskSeries struct {
 	ID         string
 	Created    Time
@@ -19,8 +26,8 @@ type TaskSeries struct {
 	URL        string
 	LocationID string
 	Tags       []string
-	// Notes      []Note
-	Task []Task
+	Notes      []Note
+	Task       []Task
 }
 
 type Priority string
@@ -83,8 +90,8 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 						URL        string `json:"url"`
 						LocationID string `json:"location_id"`
 						// Tags       []string `json:"tags>tag"`
-						// Notes      []Note   `json:"notes>note"`
-						Task []struct {
+						Notes json.RawMessage `json:"notes"`
+						Task  []struct {
 							ID  string `json:"id"`
 							Due Time   `json:"due"`
 							// HasDueTime bool `json:"has_due_time"`
@@ -134,6 +141,33 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 				}
 			}
 
+			// in RTM JSON API, notes are returned as either empty JSON array (when there are no notes),
+			// or as an object with a single field "note" containing array
+			var notes []Note
+			if string(ts.Notes) != "[]" {
+				var notesResp struct {
+					Note []struct {
+						ID       string `json:"id"`
+						Created  Time   `json:"created"`
+						Modified Time   `json:"modified"`
+						Text     string `json:"$t"`
+					} `json:"note"`
+				}
+				if err := json.Unmarshal(ts.Notes, &notesResp); err != nil {
+					return nil, err
+				}
+
+				notes = make([]Note, len(notesResp.Note))
+				for j, n := range notesResp.Note {
+					notes[j] = Note{
+						ID:       n.ID,
+						Created:  n.Created,
+						Modified: n.Modified,
+						Text:     n.Text,
+					}
+				}
+			}
+
 			taskSeries[i] = TaskSeries{
 				ID:         ts.ID,
 				Created:    ts.Created,
@@ -142,6 +176,7 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 				Source:     ts.Source,
 				URL:        ts.URL,
 				LocationID: ts.LocationID,
+				Notes:      notes,
 				Task:       tasks,
 			}
 		}

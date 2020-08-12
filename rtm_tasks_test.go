@@ -36,17 +36,17 @@ func TestTasks(t *testing.T) {
 					URL:        "https://github.com/AlekSi/rtm",
 					LocationID: "1265394",
 					// Tags:       []string{"tag1", "tag2"},
-					// Notes: []Note{{
-					// 	ID:       "81657666",
-					// 	Created:  parseTime(t, "2020-08-01T13:05:09Z"),
-					// 	Modified: parseTime(t, "2020-08-01T13:05:09Z"),
-					// 	Text:     "Note 2",
-					// }, {
-					// 	ID:       "81657665",
-					// 	Created:  parseTime(t, "2020-08-01T13:05:05Z"),
-					// 	Modified: parseTime(t, "2020-08-01T13:05:05Z"),
-					// 	Text:     "Note 1",
-					// }},
+					Notes: []Note{{
+						ID:       "81657666",
+						Created:  parseTime(t, "2020-08-01T13:05:09Z"),
+						Modified: parseTime(t, "2020-08-01T13:05:09Z"),
+						Text:     "Note 2",
+					}, {
+						ID:       "81657665",
+						Created:  parseTime(t, "2020-08-01T13:05:05Z"),
+						Modified: parseTime(t, "2020-08-01T13:05:05Z"),
+						Text:     "Note 1",
+					}},
 					Task: []Task{{
 						ID:  "622345829",
 						Due: parseTime(t, "2018-08-06T20:30:00Z"),
