@@ -14,23 +14,23 @@ func TestTasks(t *testing.T) {
 			"43911488": {
 				{
 					ID:       "358441583",
-					Created:  parseTime(t, "2018-08-05T09:30:56Z"),
-					Modified: parseTime(t, "2018-08-05T13:42:43Z"),
+					Created:  parseDateTime(t, "2018-08-05T09:30:56Z"),
+					Modified: parseDateTime(t, "2018-08-05T13:42:43Z"),
 					Name:     "Задача 2",
 					Source:   "js",
 					Task: []Task{{
 						ID:        "622345833",
-						Due:       parseTime(t, "2018-08-05T21:00:00Z"),
-						Added:     parseTime(t, "2018-08-05T09:30:56Z"),
-						Completed: parseTime(t, "2018-08-05T13:42:43Z"),
+						Due:       parseDateTime(t, "2018-08-05T21:00:00Z"),
+						Added:     parseDateTime(t, "2018-08-05T09:30:56Z"),
+						Completed: parseDateTime(t, "2018-08-05T13:42:43Z"),
 						Priority:  "2",
 						Estimate:  parseDuration(t, "PT1H12M"),
-						Start:     parseTime(t, "2018-08-04T21:00:00Z"),
+						Start:     parseDateTime(t, "2018-08-04T21:00:00Z"),
 					}},
 				}, {
 					ID:         "358441579",
-					Created:    parseTime(t, "2018-08-05T09:30:53Z"),
-					Modified:   parseTime(t, "2020-08-01T13:05:09Z"),
+					Created:    parseDateTime(t, "2018-08-05T09:30:53Z"),
+					Modified:   parseDateTime(t, "2020-08-01T13:05:09Z"),
 					Name:       "Task 1",
 					Source:     "js",
 					URL:        "https://github.com/AlekSi/rtm",
@@ -38,22 +38,22 @@ func TestTasks(t *testing.T) {
 					Tags:       []string{"tag1", "tag2"},
 					Notes: []Note{{
 						ID:       "81657666",
-						Created:  parseTime(t, "2020-08-01T13:05:09Z"),
-						Modified: parseTime(t, "2020-08-01T13:05:09Z"),
+						Created:  parseDateTime(t, "2020-08-01T13:05:09Z"),
+						Modified: parseDateTime(t, "2020-08-01T13:05:09Z"),
 						Text:     "Note 2",
 					}, {
 						ID:       "81657665",
-						Created:  parseTime(t, "2020-08-01T13:05:05Z"),
-						Modified: parseTime(t, "2020-08-01T13:05:05Z"),
+						Created:  parseDateTime(t, "2020-08-01T13:05:05Z"),
+						Modified: parseDateTime(t, "2020-08-01T13:05:05Z"),
 						Text:     "Note 1",
 					}},
 					Task: []Task{{
 						ID:           "622345829",
-						Due:          parseTime(t, "2018-08-06T20:30:00Z"),
+						Due:          parseDateTime(t, "2018-08-06T20:30:00Z"),
 						HasDueTime:   true,
-						Added:        parseTime(t, "2018-08-05T09:30:53Z"),
+						Added:        parseDateTime(t, "2018-08-05T09:30:53Z"),
 						Priority:     "N",
-						Start:        parseTime(t, "2018-08-04T21:30:00Z"),
+						Start:        parseDateTime(t, "2018-08-04T21:30:00Z"),
 						HasStartTime: true,
 					}},
 				},
@@ -68,33 +68,11 @@ func TestTasks(t *testing.T) {
 		})
 
 		t.Run("Real", func(t *testing.T) {
-			t.Skip("TODO")
-
 			actual, err := GetClient(t).Tasks().GetList(Ctx, &TasksGetListParams{
 				ListID: "43911488",
 			})
 			require.NoError(t, err)
 			assert.Equal(t, expected, actual)
-		})
-
-		t.Run("Real", func(t *testing.T) {
-			t.Skip("TODO")
-
-			params := &TasksGetListParams{
-				ListID: "43911488",
-			}
-			actual, err := GetClient(t).Tasks().GetList(Ctx, params)
-			require.NoError(t, err)
-			assert.Equal(t, expected, actual)
-
-			// for _, series := range expected {
-			// 	for _, s := range series {
-			// 		for _, task := range s.Task {
-			// 			assert.Equal(t, task.HasDueTime, task.Due.HasTime(), "due time for task %+v", task)
-			// 			assert.Equal(t, task.HasStartTime, task.Start.HasTime(), "start time for task %+v", task)
-			// 		}
-			// 	}
-			// }
 		})
 	})
 

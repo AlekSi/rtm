@@ -9,26 +9,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func parseTime(tb testing.TB, s string) Time {
+func parseDateTime(tb testing.TB, s string) DateTime {
 	tb.Helper()
 
-	var t Time
+	var t DateTime
 	err := json.Unmarshal([]byte(`"`+s+`"`), &t)
 	require.NoError(tb, err)
 	return t
 }
 
-func TestTime(t *testing.T) {
-	for j, expected := range map[string]Time{
+func TestDateTime(t *testing.T) {
+	for j, expected := range map[string]DateTime{
 		`"2019-01-20T09:20:58Z"`: {time.Date(2019, 1, 20, 9, 20, 58, 0, time.UTC)},
 		`""`:                     {},
 	} {
 		t.Run(j, func(t *testing.T) {
 			b := []byte(`{"completed":` + j + `}`)
 			var actual struct {
-				Completed Time `json:"completed"`
+				Completed DateTime `json:"completed"`
 			}
-			actual.Completed = parseTime(t, "2020-01-02T03:04:05Z")
+			actual.Completed = parseDateTime(t, "2020-01-02T03:04:05Z")
 
 			err := json.Unmarshal(b, &actual)
 			require.NoError(t, err)

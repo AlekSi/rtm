@@ -13,15 +13,15 @@ type TasksService struct {
 
 type Note struct {
 	ID       string
-	Created  Time
-	Modified Time
+	Created  DateTime
+	Modified DateTime
 	Text     string
 }
 
 type TaskSeries struct {
 	ID         string
-	Created    Time
-	Modified   Time
+	Created    DateTime
+	Modified   DateTime
 	Name       string
 	Source     string
 	URL        string
@@ -35,21 +35,21 @@ type Priority string
 
 type Task struct {
 	ID           string
-	Due          Time
+	Due          DateTime
 	HasDueTime   bool
-	Added        Time
-	Completed    Time
-	Deleted      Time
+	Added        DateTime
+	Completed    DateTime
+	Deleted      DateTime
 	Priority     Priority
 	Estimate     time.Duration
-	Start        Time
+	Start        DateTime
 	HasStartTime bool
 }
 
 type TasksGetListParams struct {
 	ListID   string
 	Filter   string
-	LastSync Time
+	LastSync DateTime
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.getList.rtm
@@ -84,8 +84,8 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 					ID         string `json:"id"`
 					TaskSeries []struct {
 						ID         string          `json:"id"`
-						Created    Time            `json:"created"`
-						Modified   Time            `json:"modified"`
+						Created    DateTime        `json:"created"`
+						Modified   DateTime        `json:"modified"`
 						Name       string          `json:"name"`
 						Source     string          `json:"source"`
 						URL        string          `json:"url"`
@@ -94,14 +94,14 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 						Notes      json.RawMessage `json:"notes"`
 						Task       []struct {
 							ID           string      `json:"id"`
-							Due          Time        `json:"due"`
+							Due          DateTime    `json:"due"`
 							HasDueTime   rtmBool     `json:"has_due_time"`
-							Added        Time        `json:"added"`
-							Completed    Time        `json:"completed"`
-							Deleted      Time        `json:"deleted"`
+							Added        DateTime    `json:"added"`
+							Completed    DateTime    `json:"completed"`
+							Deleted      DateTime    `json:"deleted"`
 							Priority     Priority    `json:"priority"`
 							Estimate     rtmDuration `json:"estimate"`
-							Start        Time        `json:"start"`
+							Start        DateTime    `json:"start"`
 							HasStartTime rtmBool     `json:"has_start_time"`
 						} `json:"task"`
 					} `json:"taskseries"`
@@ -165,10 +165,10 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 			if string(ts.Notes) != "[]" {
 				var notesResp struct {
 					Note []struct {
-						ID       string `json:"id"`
-						Created  Time   `json:"created"`
-						Modified Time   `json:"modified"`
-						Text     string `json:"$t"`
+						ID       string   `json:"id"`
+						Created  DateTime `json:"created"`
+						Modified DateTime `json:"modified"`
+						Text     string   `json:"$t"`
 					} `json:"note"`
 				}
 				if err := json.Unmarshal(ts.Notes, &notesResp); err != nil {

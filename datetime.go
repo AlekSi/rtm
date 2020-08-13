@@ -6,13 +6,13 @@ import (
 	"time"
 )
 
-// Time wraps time.Time with ISO 8601 (like `2019-01-20T09:20:58Z`) JSON encoding and decoding.
-type Time struct {
+// DateTime wraps time.Time with ISO 8601 (like `2019-01-20T09:20:58Z`) JSON encoding and decoding.
+type DateTime struct {
 	time.Time
 }
 
 // String implements fmt.Stringer.
-func (t Time) String() string {
+func (t DateTime) String() string {
 	if t.IsZero() {
 		return ""
 	}
@@ -20,14 +20,14 @@ func (t Time) String() string {
 }
 
 // MarshalJSON implements json.Marshaler.
-func (t Time) MarshalJSON() ([]byte, error) {
+func (t DateTime) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + t.String() + `"`), nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (t *Time) UnmarshalJSON(data []byte) error {
+func (t *DateTime) UnmarshalJSON(data []byte) error {
 	if len(data) < 2 {
-		return fmt.Errorf("rtm.Time.UnmarshalJSON: too short")
+		return fmt.Errorf("rtm.DateTime.UnmarshalJSON: too short")
 	}
 
 	var tt time.Time
@@ -38,7 +38,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 
 	var err error
 	if tt, err = time.Parse(`"`+time.RFC3339+`"`, string(data)); err != nil {
-		return fmt.Errorf("rtm.Time.UnmarshalJSON: %w", err)
+		return fmt.Errorf("rtm.DateTime.UnmarshalJSON: %w", err)
 	}
 
 	t.Time = tt.UTC()
@@ -58,7 +58,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 
 // check interfaces
 var (
-	_ fmt.Stringer     = Time{}
-	_ json.Marshaler   = Time{}
-	_ json.Unmarshaler = (*Time)(nil)
+	_ fmt.Stringer     = DateTime{}
+	_ json.Marshaler   = DateTime{}
+	_ json.Unmarshaler = (*DateTime)(nil)
 )
