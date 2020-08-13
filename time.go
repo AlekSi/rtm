@@ -11,6 +11,7 @@ type Time struct {
 	time.Time
 }
 
+// String implements fmt.Stringer.
 func (t Time) String() string {
 	if t.IsZero() {
 		return ""

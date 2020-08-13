@@ -9,17 +9,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func parseDuration(tb testing.TB, s string) Duration {
+func parseDuration(tb testing.TB, s string) time.Duration {
 	tb.Helper()
 
-	var d Duration
+	var d rtmDuration
 	err := json.Unmarshal([]byte(`"`+s+`"`), &d)
 	require.NoError(tb, err)
-	return d
+	return d.Duration
 }
 
 func TestDuration(t *testing.T) {
-	for j, expected := range map[string]Duration{
+	for j, expected := range map[string]rtmDuration{
 		`""`:        {0},
 		`"PT5M"`:    {5 * time.Minute},
 		`"PT1H"`:    {time.Hour},
@@ -29,9 +29,9 @@ func TestDuration(t *testing.T) {
 		t.Run(j, func(t *testing.T) {
 			b := []byte(`{"estimate":` + j + `}`)
 			var actual struct {
-				Estimate Duration `json:"estimate"`
+				Estimate rtmDuration `json:"estimate"`
 			}
-			actual.Estimate = parseDuration(t, "PT1H02M")
+			actual.Estimate = rtmDuration{parseDuration(t, "PT1H02M")}
 
 			err := json.Unmarshal(b, &actual)
 			require.NoError(t, err)

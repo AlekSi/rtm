@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"encoding/xml"
+	"time"
 )
 
 type TasksService struct {
@@ -40,7 +41,7 @@ type Task struct {
 	Completed    Time
 	Deleted      Time
 	Priority     Priority
-	Estimate     Duration
+	Estimate     time.Duration
 	Start        Time
 	HasStartTime bool
 }
@@ -92,16 +93,16 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 						Tags       json.RawMessage `json:"tags"`
 						Notes      json.RawMessage `json:"notes"`
 						Task       []struct {
-							ID           string   `json:"id"`
-							Due          Time     `json:"due"`
-							HasDueTime   rtmBool  `json:"has_due_time"`
-							Added        Time     `json:"added"`
-							Completed    Time     `json:"completed"`
-							Deleted      Time     `json:"deleted"`
-							Priority     Priority `json:"priority"`
-							Estimate     Duration `json:"estimate"`
-							Start        Time     `json:"start"`
-							HasStartTime rtmBool  `json:"has_start_time"`
+							ID           string      `json:"id"`
+							Due          Time        `json:"due"`
+							HasDueTime   rtmBool     `json:"has_due_time"`
+							Added        Time        `json:"added"`
+							Completed    Time        `json:"completed"`
+							Deleted      Time        `json:"deleted"`
+							Priority     Priority    `json:"priority"`
+							Estimate     rtmDuration `json:"estimate"`
+							Start        Time        `json:"start"`
+							HasStartTime rtmBool     `json:"has_start_time"`
 						} `json:"task"`
 					} `json:"taskseries"`
 				} `json:"list"`
@@ -138,7 +139,7 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 					Completed:    t.Completed,
 					Deleted:      t.Deleted,
 					Priority:     t.Priority,
-					Estimate:     t.Estimate,
+					Estimate:     t.Estimate.Duration,
 					Start:        t.Start,
 					HasStartTime: bool(t.HasStartTime),
 				}

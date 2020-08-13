@@ -9,12 +9,13 @@ import (
 	"time"
 )
 
-// Duration wraps time.Duration with ISO 8601 (like `PT1H30M`) JSON encoding and decoding,
-type Duration struct {
+// rtmDuration wraps time.Duration with ISO 8601 (like `PT1H30M`) JSON encoding and decoding,
+type rtmDuration struct {
 	time.Duration
 }
 
-func (d Duration) String() string {
+// String implements fmt.Stringer.
+func (d rtmDuration) String() string {
 	if d.Duration == 0 {
 		return ""
 	}
@@ -32,16 +33,16 @@ func (d Duration) String() string {
 }
 
 // MarshalJSON implements json.Marshaler.
-func (d Duration) MarshalJSON() ([]byte, error) {
+func (d rtmDuration) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + d.String() + `"`), nil
 }
 
 var durationRE = regexp.MustCompile(`^"PT(\d+H)?(\d+M)?"$`)
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (d *Duration) UnmarshalJSON(data []byte) error {
+func (d *rtmDuration) UnmarshalJSON(data []byte) error {
 	if len(data) < 2 {
-		return fmt.Errorf("rtm.Duration.UnmarshalJSON: too short")
+		return fmt.Errorf("rtm.rtmDuration.UnmarshalJSON: too short")
 	}
 
 	if len(data) == 2 && data[0] == '"' && data[1] == '"' {
@@ -50,7 +51,7 @@ func (d *Duration) UnmarshalJSON(data []byte) error {
 	}
 
 	s := string(data)
-	failed := fmt.Errorf("rtm.Duration.UnmarshalJSON: failed to parse %q", s)
+	failed := fmt.Errorf("rtm.rtmDuration.UnmarshalJSON: failed to parse %q", s)
 	matches := durationRE.FindStringSubmatch(s)
 	if len(matches) != 3 {
 		return failed
@@ -76,7 +77,7 @@ func (d *Duration) UnmarshalJSON(data []byte) error {
 
 // check interfaces
 var (
-	_ fmt.Stringer     = Duration{}
-	_ json.Marshaler   = Duration{}
-	_ json.Unmarshaler = (*Duration)(nil)
+	_ fmt.Stringer     = rtmDuration{}
+	_ json.Marshaler   = rtmDuration{}
+	_ json.Unmarshaler = (*rtmDuration)(nil)
 )
