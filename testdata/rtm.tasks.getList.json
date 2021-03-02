@@ -8,34 +8,6 @@
                     "id": "43911488",
                     "taskseries": [
                         {
-                            "id": "358441583",
-                            "created": "2018-08-05T09:30:56Z",
-                            "modified": "2018-08-05T13:42:43Z",
-                            "name": "Задача 2",
-                            "source": "js",
-                            "url": "",
-                            "location_id": "",
-                            "parent_task_id": "",
-                            "tags": [],
-                            "participants": [],
-                            "notes": [],
-                            "task": [
-                                {
-                                    "id": "622345833",
-                                    "due": "2018-08-05T21:00:00Z",
-                                    "has_due_time": "0",
-                                    "added": "2018-08-05T09:30:56Z",
-                                    "completed": "2018-08-05T13:42:43Z",
-                                    "deleted": "",
-                                    "priority": "2",
-                                    "postponed": "0",
-                                    "estimate": "PT1H12M",
-                                    "start": "2018-08-04T21:00:00Z",
-                                    "has_start_time": "0"
-                                }
-                            ]
-                        },
-                        {
                             "id": "358441579",
                             "created": "2018-08-05T09:30:53Z",
                             "modified": "2020-08-01T13:05:09Z",
@@ -82,6 +54,34 @@
                                     "estimate": "",
                                     "start": "2018-08-04T21:30:00Z",
                                     "has_start_time": "1"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "358441583",
+                            "created": "2018-08-05T09:30:56Z",
+                            "modified": "2018-08-05T13:42:43Z",
+                            "name": "Задача 2",
+                            "source": "js",
+                            "url": "",
+                            "location_id": "",
+                            "parent_task_id": "",
+                            "tags": [],
+                            "participants": [],
+                            "notes": [],
+                            "task": [
+                                {
+                                    "id": "622345833",
+                                    "due": "2018-08-05T21:00:00Z",
+                                    "has_due_time": "0",
+                                    "added": "2018-08-05T09:30:56Z",
+                                    "completed": "2018-08-05T13:42:43Z",
+                                    "deleted": "",
+                                    "priority": "2",
+                                    "postponed": "0",
+                                    "estimate": "PT1H12M",
+                                    "start": "2018-08-04T21:00:00Z",
+                                    "has_start_time": "0"
                                 }
                             ]
                         }

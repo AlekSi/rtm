@@ -2,32 +2,24 @@ package rtm
 
 import (
 	"encoding/xml"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func sortByIDs(list map[string][]TaskSeries) {
+	for k := range list {
+		sort.Slice(list[k], func(i, j int) bool { return list[k][i].ID < list[k][j].ID })
+	}
+}
+
 func TestTasks(t *testing.T) {
 	t.Run("GetList", func(t *testing.T) {
 		expected := map[string][]TaskSeries{
 			"43911488": {
 				{
-					ID:       "358441583",
-					Created:  parseDateTime(t, "2018-08-05T09:30:56Z"),
-					Modified: parseDateTime(t, "2018-08-05T13:42:43Z"),
-					Name:     "Задача 2",
-					Source:   "js",
-					Task: []Task{{
-						ID:        "622345833",
-						Due:       parseDateTime(t, "2018-08-05T21:00:00Z"),
-						Added:     parseDateTime(t, "2018-08-05T09:30:56Z"),
-						Completed: parseDateTime(t, "2018-08-05T13:42:43Z"),
-						Priority:  "2",
-						Estimate:  parseDuration(t, "PT1H12M"),
-						Start:     parseDateTime(t, "2018-08-04T21:00:00Z"),
-					}},
-				}, {
 					ID:         "358441579",
 					Created:    parseDateTime(t, "2018-08-05T09:30:53Z"),
 					Modified:   parseDateTime(t, "2020-08-01T13:05:09Z"),
@@ -55,6 +47,21 @@ func TestTasks(t *testing.T) {
 						Priority:     "N",
 						Start:        parseDateTime(t, "2018-08-04T21:30:00Z"),
 						HasStartTime: true,
+					}},
+				}, {
+					ID:       "358441583",
+					Created:  parseDateTime(t, "2018-08-05T09:30:56Z"),
+					Modified: parseDateTime(t, "2018-08-05T13:42:43Z"),
+					Name:     "Задача 2",
+					Source:   "js",
+					Task: []Task{{
+						ID:        "622345833",
+						Due:       parseDateTime(t, "2018-08-05T21:00:00Z"),
+						Added:     parseDateTime(t, "2018-08-05T09:30:56Z"),
+						Completed: parseDateTime(t, "2018-08-05T13:42:43Z"),
+						Priority:  "2",
+						Estimate:  parseDuration(t, "PT1H12M"),
+						Start:     parseDateTime(t, "2018-08-04T21:00:00Z"),
 					}},
 				},
 			},
