@@ -20,7 +20,8 @@ func parseDateTime(tb testing.TB, s string) DateTime {
 
 func TestDateTime(t *testing.T) {
 	for j, expected := range map[string]DateTime{
-		`"2019-01-20T09:20:58Z"`: {time.Date(2019, 1, 20, 9, 20, 58, 0, time.UTC)},
+		`"2019-01-20T09:20:58Z"`: {Time: time.Date(2019, 1, 20, 9, 20, 58, 0, time.UTC), HasTime: true},
+		`"2019-01-20"`:           {Time: time.Date(2019, 1, 20, 0, 0, 0, 0, time.UTC), HasTime: false},
 		`""`:                     {},
 	} {
 		t.Run(j, func(t *testing.T) {

@@ -6,9 +6,15 @@ import (
 	"time"
 )
 
-// DateTime wraps time.Time with ISO 8601 (like `2019-01-20T09:20:58Z`) JSON encoding and decoding.
+const (
+	dateFormat     = "2006-01-02"
+	dateTimeFormat = "2006-01-02T15:04:05Z07:00"
+)
+
+// DateTime wraps time.Time with ISO 8601 (like `2006-01-02T15:04:05Z`) JSON encoding and decoding.
 type DateTime struct {
 	time.Time
+	HasTime bool
 }
 
 // String implements fmt.Stringer.
@@ -16,7 +22,10 @@ func (t DateTime) String() string {
 	if t.IsZero() {
 		return ""
 	}
-	return t.UTC().Format(time.RFC3339)
+	if !t.HasTime {
+		return t.Format(dateFormat)
+	}
+	return t.UTC().Format(dateTimeFormat)
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -33,16 +42,26 @@ func (t *DateTime) UnmarshalJSON(data []byte) error {
 	var tt time.Time
 	if len(data) == 2 && data[0] == '"' && data[1] == '"' {
 		t.Time = tt
+		t.HasTime = false
 		return nil
 	}
 
 	var err error
-	if tt, err = time.Parse(`"`+time.RFC3339+`"`, string(data)); err != nil {
-		return fmt.Errorf("rtm.DateTime.UnmarshalJSON: %w", err)
+	tt, err = time.Parse(`"`+dateTimeFormat+`"`, string(data))
+	if err == nil {
+		t.Time = tt.UTC()
+		t.HasTime = true
+		return nil
 	}
 
-	t.Time = tt.UTC()
-	return nil
+	tt, err = time.Parse(`"`+dateFormat+`"`, string(data))
+	if err == nil {
+		t.Time = tt
+		t.HasTime = false
+		return nil
+	}
+
+	return fmt.Errorf("rtm.DateTime.UnmarshalJSON: %w", err)
 }
 
 // // hasTime returns false if this instance contains only date without time.
