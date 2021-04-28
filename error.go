@@ -5,8 +5,8 @@ import (
 )
 
 type Error struct {
-	Code int    `xml:"code,attr"`
-	Msg  string `xml:"msg,attr"`
+	Code int
+	Msg  string
 }
 
 func (e *Error) Error() string {

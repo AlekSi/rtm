@@ -1,0 +1,12 @@
+{
+    "rsp": {
+        "stat": "ok",
+        "format": "json",
+        "method": "rtm.test.echo",
+        "api_sig": "8f5464b593f1768519c68948ed092d09",
+        "v": "2",
+        "api_key": "XXX",
+        "auth_token": "XXX",
+        "foo": "bar"
+    }
+}

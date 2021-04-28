@@ -1,0 +1,14 @@
+{
+    "rsp": {
+        "stat": "ok",
+        "auth": {
+            "token": "XXX",
+            "perms": "delete",
+            "user": {
+                "id": "6561679",
+                "username": "alexey.tester",
+                "fullname": "Alexey Tester"
+            }
+        }
+    }
+}

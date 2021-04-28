@@ -1,0 +1,9 @@
+{
+    "rsp": {
+        "stat": "fail",
+        "err": {
+            "code": "112",
+            "msg": "Method \"no.such.method\" not found"
+        }
+    }
+}

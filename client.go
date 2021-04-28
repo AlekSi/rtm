@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -13,6 +14,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -200,6 +202,7 @@ func unmarshalXMLRsp(b []byte) ([]byte, error) {
 	}
 }
 
+// TODO remove
 func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, error) {
 	b, err := c.post(ctx, method, args, "")
 	if err != nil {
@@ -207,6 +210,44 @@ func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, er
 	}
 
 	return unmarshalXMLRsp(b)
+}
+
+// TODO rename to Call
+func (c *Client) CallJSON(ctx context.Context, method string, args Args) ([]byte, error) {
+	b, err := c.post(ctx, method, args, "json")
+	if err != nil {
+		return nil, err
+	}
+
+	return c.callJSONUnmarshal(b)
+}
+
+// TODO rename to callUnmarshal
+func (c *Client) callJSONUnmarshal(b []byte) ([]byte, error) {
+	var resp struct {
+		Rsp struct {
+			Stat string `json:"stat"`
+			Err  *struct {
+				Code string `json:"code"`
+				Msg  string `json:"msg"`
+			} `json:"err"`
+		} `json:"rsp"`
+	}
+	err := json.Unmarshal(b, &resp)
+	switch {
+	case err != nil:
+		return nil, err
+	case resp.Rsp.Err != nil:
+		code, _ := strconv.Atoi(resp.Rsp.Err.Code)
+		return nil, &Error{
+			Code: code,
+			Msg:  resp.Rsp.Err.Msg,
+		}
+	case resp.Rsp.Stat != "ok":
+		return nil, fmt.Errorf("unexpected stat %q", resp.Rsp.Stat)
+	default:
+		return b, nil
+	}
 }
 
 // check interfaces
