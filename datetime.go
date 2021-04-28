@@ -22,10 +22,10 @@ func (t DateTime) String() string {
 	if t.IsZero() {
 		return ""
 	}
-	if !t.HasTime {
-		return t.Format(dateFormat)
-	}
-	return t.UTC().Format(dateTimeFormat)
+	// if !t.HasTime {
+	// 	return t.Format(dateFormat)
+	// }
+	return t.Format(dateTimeFormat)
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -49,14 +49,14 @@ func (t *DateTime) UnmarshalJSON(data []byte) error {
 	var err error
 	tt, err = time.Parse(`"`+dateTimeFormat+`"`, string(data))
 	if err == nil {
-		t.Time = tt.UTC()
+		t.Time = tt //.UTC()
 		t.HasTime = true
 		return nil
 	}
 
 	tt, err = time.Parse(`"`+dateFormat+`"`, string(data))
 	if err == nil {
-		t.Time = tt
+		t.Time = tt //.UTC()
 		t.HasTime = false
 		return nil
 	}

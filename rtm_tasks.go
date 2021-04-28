@@ -34,16 +34,14 @@ type TaskSeries struct {
 type Priority string
 
 type Task struct {
-	ID           string
-	Due          DateTime
-	HasDueTime   bool
-	Added        DateTime
-	Completed    DateTime
-	Deleted      DateTime
-	Priority     Priority
-	Estimate     time.Duration
-	Start        DateTime
-	HasStartTime bool
+	ID        string
+	Due       DateTime
+	Added     DateTime
+	Completed DateTime
+	Deleted   DateTime
+	Priority  Priority
+	Estimate  time.Duration
+	Start     DateTime
 }
 
 type TasksGetListParams struct {
@@ -131,17 +129,17 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 		for i, ts := range l.TaskSeries {
 			tasks := make([]Task, len(ts.Task))
 			for j, t := range ts.Task {
+				t.Due.HasTime = bool(t.HasDueTime)
+				t.Start.HasTime = bool(t.HasStartTime)
 				tasks[j] = Task{
-					ID:           t.ID,
-					Due:          t.Due,
-					HasDueTime:   bool(t.HasDueTime),
-					Added:        t.Added,
-					Completed:    t.Completed,
-					Deleted:      t.Deleted,
-					Priority:     t.Priority,
-					Estimate:     t.Estimate.Duration,
-					Start:        t.Start,
-					HasStartTime: bool(t.HasStartTime),
+					ID:        t.ID,
+					Due:       t.Due,
+					Added:     t.Added,
+					Completed: t.Completed,
+					Deleted:   t.Deleted,
+					Priority:  t.Priority,
+					Estimate:  t.Estimate.Duration,
+					Start:     t.Start,
 				}
 			}
 
