@@ -4,9 +4,10 @@ import (
 	"fmt"
 )
 
+// Error represents API error.
 type Error struct {
-	Code int
-	Msg  string
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
 }
 
 func (e *Error) Error() string {

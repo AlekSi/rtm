@@ -14,7 +14,12 @@ const (
 // DateTime wraps time.Time with ISO 8601 (like `2006-01-02T15:04:05Z`) JSON encoding and decoding.
 type DateTime struct {
 	time.Time
-	HasTime bool
+	hasTime bool // do not set this field directly
+}
+
+func (t *DateTime) stripTime() {
+	t.Time = time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+	t.hasTime = false
 }
 
 // String implements fmt.Stringer.
@@ -22,9 +27,9 @@ func (t DateTime) String() string {
 	if t.IsZero() {
 		return ""
 	}
-	// if !t.HasTime {
-	// 	return t.Format(dateFormat)
-	// }
+	if !t.hasTime {
+		return t.Format(dateFormat)
+	}
 	return t.Format(dateTimeFormat)
 }
 
@@ -42,38 +47,27 @@ func (t *DateTime) UnmarshalJSON(data []byte) error {
 	var tt time.Time
 	if len(data) == 2 && data[0] == '"' && data[1] == '"' {
 		t.Time = tt
-		t.HasTime = false
+		t.hasTime = false
 		return nil
 	}
 
 	var err error
 	tt, err = time.Parse(`"`+dateTimeFormat+`"`, string(data))
 	if err == nil {
-		t.Time = tt //.UTC()
-		t.HasTime = true
+		t.Time = tt
+		t.hasTime = true
 		return nil
 	}
 
 	tt, err = time.Parse(`"`+dateFormat+`"`, string(data))
 	if err == nil {
-		t.Time = tt //.UTC()
-		t.HasTime = false
+		t.Time = tt
+		t.hasTime = false
 		return nil
 	}
 
 	return fmt.Errorf("rtm.DateTime.UnmarshalJSON: %w", err)
 }
-
-// // hasTime returns false if this instance contains only date without time.
-// func (t Time) hasTime() bool {
-// 	hour, min, sec := t.Clock()
-// 	return hour != 0 || min != 0 || sec != 0
-// }
-
-// func (t Time) withoutTime() Time {
-// 	year, month, day := t.Date()
-// 	return Time{time.Date(year, month, day, 0, 0, 0, 0, time.UTC)}
-// }
 
 // check interfaces
 var (

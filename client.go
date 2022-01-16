@@ -71,6 +71,7 @@ func (c *Client) http() *http.Client {
 }
 
 // sign adds api_sig to request parameters.
+//
 // See https://www.rememberthemilk.com/services/api/authentication.rtm, "Signing Requests".
 func (c *Client) sign(q url.Values) {
 	keys := make([]string, 0, len(q))
@@ -89,6 +90,7 @@ func (c *Client) sign(q url.Values) {
 }
 
 // AuthenticationURL returns authentication URL for given permissions and frob (that can be empty).
+//
 // See https://www.rememberthemilk.com/services/api/authentication.rtm, "User authentication for web-based applications"
 // and "User authentication for desktop applications".
 func (c *Client) AuthenticationURL(perms Perms, frob string) string {

@@ -114,23 +114,16 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 
 	res := make(map[string][]TaskSeries, len(resp.Rsp.Tasks.List))
 	for _, l := range resp.Rsp.Tasks.List {
-		// for i, series := range list.TaskSeries {
-		// 	for j, task := range series.Task {
-		// 		if !task.HasDueTime {
-		// 			list.TaskSeries[i].Task[j].Due = task.Due.withoutTime()
-		// 		}
-		// 		if !task.HasStartTime {
-		// 			list.TaskSeries[i].Task[j].Start = task.Start.withoutTime()
-		// 		}
-		// 	}
-		// }
-
 		taskSeries := make([]TaskSeries, len(l.TaskSeries))
 		for i, ts := range l.TaskSeries {
 			tasks := make([]Task, len(ts.Task))
 			for j, t := range ts.Task {
-				t.Due.HasTime = bool(t.HasDueTime)
-				t.Start.HasTime = bool(t.HasStartTime)
+				if !t.HasDueTime {
+					t.Due.stripTime()
+				}
+				if !t.HasStartTime {
+					t.Start.stripTime()
+				}
 				tasks[j] = Task{
 					ID:        t.ID,
 					Due:       t.Due,
