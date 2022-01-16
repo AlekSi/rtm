@@ -22,10 +22,20 @@
                 "rtm.lists.setName",
                 "rtm.lists.unarchive",
                 "rtm.locations.getList",
-                "rtm.tags.getList",
+                "rtm.push.getSubscriptions",
+                "rtm.push.getTopics",
+                "rtm.push.subscribe",
+                "rtm.push.unsubscribe",
                 "rtm.reflection.getMethodInfo",
                 "rtm.reflection.getMethods",
+                "rtm.script.getList",
+                "rtm.script.run",
+                "rtm.scripts.add",
+                "rtm.scripts.delete",
+                "rtm.scripts.setCode",
+                "rtm.scripts.setName",
                 "rtm.settings.getList",
+                "rtm.tags.getList",
                 "rtm.tasks.add",
                 "rtm.tasks.addTags",
                 "rtm.tasks.complete",
@@ -55,11 +65,7 @@
                 "rtm.time.parse",
                 "rtm.timelines.create",
                 "rtm.timezones.getList",
-                "rtm.transactions.undo",
-                "rtm.push.getSubscriptions",
-                "rtm.push.getTopics",
-                "rtm.push.subscribe",
-                "rtm.push.unsubscribe"
+                "rtm.transactions.undo"
             ]
         }
     }
