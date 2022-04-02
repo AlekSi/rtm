@@ -18,8 +18,7 @@ func (b rtmBool) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (b *rtmBool) UnmarshalJSON(data []byte) error {
-	s := string(data)
-	switch string(data) {
+	switch s := string(data); s {
 	case `"0"`:
 		*b = false
 	case `"1"`:

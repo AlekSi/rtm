@@ -3,7 +3,6 @@ package rtm
 import (
 	"context"
 	"encoding/json"
-	"strconv"
 )
 
 type ListsService struct {
@@ -13,9 +12,10 @@ type ListsService struct {
 type List struct {
 	ID       string
 	Name     string
+	Position int
 	Locked   bool
 	Archived bool
-	Position int
+	Deleted  bool
 	Smart    bool
 }
 
@@ -34,12 +34,13 @@ func (l *ListsService) getListUnmarshal(b []byte) ([]List, error) {
 		Rsp struct {
 			Lists struct {
 				List []struct {
-					ID       string `json:"id"`
-					Name     string `json:"name"`
-					Locked   string `json:"locked"`
-					Archived string `json:"archived"`
-					Position string `json:"position"`
-					Smart    string `json:"smart"`
+					ID       string  `json:"id"`
+					Name     string  `json:"name"`
+					Deleted  rtmBool `json:"deleted"`
+					Locked   rtmBool `json:"locked"`
+					Archived rtmBool `json:"archived"`
+					Position int     `json:"position,string"`
+					Smart    rtmBool `json:"smart"`
 				} `json:"list"`
 			} `json:"lists"`
 		} `json:"rsp"`
@@ -50,18 +51,16 @@ func (l *ListsService) getListUnmarshal(b []byte) ([]List, error) {
 
 	res := make([]List, len(resp.Rsp.Lists.List))
 	for i, l := range resp.Rsp.Lists.List {
-		locked, _ := strconv.ParseBool(l.Locked)
-		archived, _ := strconv.ParseBool(l.Archived)
-		position, _ := strconv.Atoi(l.Position)
-		smart, _ := strconv.ParseBool(l.Smart)
 		res[i] = List{
 			ID:       l.ID,
 			Name:     l.Name,
-			Locked:   locked,
-			Archived: archived,
-			Position: position,
-			Smart:    smart,
+			Position: l.Position,
+			Locked:   bool(l.Locked),
+			Archived: bool(l.Archived),
+			Deleted:  bool(l.Deleted),
+			Smart:    bool(l.Smart),
 		}
 	}
+
 	return res, nil
 }
