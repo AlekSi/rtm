@@ -210,7 +210,7 @@ type tasksAddResponseList struct {
 }
 
 type tasksAddResponse struct {
-	Transaction          *Transaction         `json:"transaction"`
+	// Transaction          *Transaction         `json:"transaction"`
 	TasksAddResponseList tasksAddResponseList `json:"list"`
 }
 

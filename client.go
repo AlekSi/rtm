@@ -13,7 +13,6 @@ import (
 	"net/url"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -189,7 +188,7 @@ func checkErrorResponse(b []byte) error {
 		Rsp struct {
 			Stat string `json:"stat"`
 			Err  *struct {
-				Code string `json:"code"`
+				Code int    `json:"code,string"`
 				Msg  string `json:"msg"`
 			} `json:"err"`
 		} `json:"rsp"`
@@ -199,9 +198,8 @@ func checkErrorResponse(b []byte) error {
 	case err != nil:
 		return err
 	case resp.Rsp.Err != nil:
-		code, _ := strconv.Atoi(resp.Rsp.Err.Code)
 		return &Error{
-			Code: code,
+			Code: resp.Rsp.Err.Code,
 			Msg:  resp.Rsp.Err.Msg,
 		}
 	case resp.Rsp.Stat != "ok":

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"sort"
-	"strconv"
 )
 
 type ReflectionService struct {
@@ -30,8 +29,8 @@ func (r *ReflectionService) getMethodInfoUnmarshal(b []byte) (*MethodInfo, error
 	var resp struct {
 		Rsp struct {
 			Method struct {
-				Name       string `json:"name"`
-				NeedsLogin string `json:"needslogin"`
+				Name       string  `json:"name"`
+				NeedsLogin rtmBool `json:"needslogin"`
 			} `json:"method"`
 		} `json:"rsp"`
 	}
@@ -39,11 +38,9 @@ func (r *ReflectionService) getMethodInfoUnmarshal(b []byte) (*MethodInfo, error
 		return nil, err
 	}
 
-	needsLogin, _ := strconv.ParseBool(resp.Rsp.Method.NeedsLogin)
-
 	return &MethodInfo{
 		Name:       resp.Rsp.Method.Name,
-		NeedsLogin: needsLogin,
+		NeedsLogin: bool(resp.Rsp.Method.NeedsLogin),
 	}, nil
 }
 

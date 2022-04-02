@@ -87,10 +87,6 @@ func TestTasks(t *testing.T) {
 		t.Skip("TODO")
 
 		expected := tasksAddResponse{
-			Transaction: &Transaction{
-				XMLName: xml.Name{Local: "transaction"},
-				ID:      "4613647463",
-			},
 			TasksAddResponseList: tasksAddResponseList{
 				XMLName: xml.Name{Local: "list"},
 				ListID:  "43911488",

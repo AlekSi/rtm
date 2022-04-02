@@ -8,10 +8,8 @@ import (
 )
 
 func TestTimelines(t *testing.T) {
-	t.Skip("TODO")
-
 	t.Run("Create", func(t *testing.T) {
-		expected := "1408177753"
+		expected := "1565350547"
 
 		t.Run("Unmarshal", func(t *testing.T) {
 			b := readTestdataFile(t, "rtm.timelines.create.json")
