@@ -2,8 +2,7 @@ module github.com/AlekSi/rtm
 
 go 1.17
 
-// Use @master until v1.7.1 with https://github.com/stretchr/testify/issues/989 is released.
-require github.com/stretchr/testify v1.7.1-0.20210824115523-ab6dc3262822
+require github.com/stretchr/testify v1.7.1
 
 require (
 	github.com/davecgh/go-spew v1.1.0 // indirect
