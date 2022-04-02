@@ -3,7 +3,6 @@ package rtm
 import (
 	"context"
 	"encoding/json"
-	"encoding/xml"
 	"time"
 )
 
@@ -44,6 +43,81 @@ type Task struct {
 	Start     DateTime
 }
 
+type taskResp struct {
+	ID           string      `json:"id"`
+	Due          DateTime    `json:"due"`
+	HasDueTime   rtmBool     `json:"has_due_time"`
+	Added        DateTime    `json:"added"`
+	Completed    DateTime    `json:"completed"`
+	Deleted      DateTime    `json:"deleted"`
+	Priority     Priority    `json:"priority"`
+	Estimate     rtmDuration `json:"estimate"`
+	Start        DateTime    `json:"start"`
+	HasStartTime rtmBool     `json:"has_start_time"`
+}
+
+type taskSeriesResp struct {
+	ID         string          `json:"id"`
+	Created    DateTime        `json:"created"`
+	Modified   DateTime        `json:"modified"`
+	Name       string          `json:"name"`
+	Source     string          `json:"source"`
+	URL        string          `json:"url"`
+	LocationID string          `json:"location_id"`
+	Tags       json.RawMessage `json:"tags"`
+	Notes      json.RawMessage `json:"notes"`
+	Task       []taskResp      `json:"task"`
+}
+
+func (ts *taskSeriesResp) parseTags() ([]string, error) {
+	// in RTM JSON API, tags are returned as either empty JSON array (when there are no tags),
+	// or as an object with a single field "tag" containing array
+	if string(ts.Tags) == "[]" {
+		return nil, nil
+	}
+
+	var tagsResp struct {
+		Tags []string `json:"tag"`
+	}
+	if err := json.Unmarshal(ts.Tags, &tagsResp); err != nil {
+		return nil, err
+	}
+
+	return tagsResp.Tags, nil
+}
+
+func (ts *taskSeriesResp) parseNotes() ([]Note, error) {
+	// in RTM JSON API, notes are returned as either empty JSON array (when there are no notes),
+	// or as an object with a single field "note" containing array
+	if string(ts.Notes) == "[]" {
+		return nil, nil
+	}
+
+	var notesResp struct {
+		Note []struct {
+			ID       string   `json:"id"`
+			Created  DateTime `json:"created"`
+			Modified DateTime `json:"modified"`
+			Text     string   `json:"$t"`
+		} `json:"note"`
+	}
+	if err := json.Unmarshal(ts.Notes, &notesResp); err != nil {
+		return nil, err
+	}
+
+	res := make([]Note, len(notesResp.Note))
+	for j, n := range notesResp.Note {
+		res[j] = Note{
+			ID:       n.ID,
+			Created:  n.Created,
+			Modified: n.Modified,
+			Text:     n.Text,
+		}
+	}
+
+	return res, nil
+}
+
 type TasksGetListParams struct {
 	ListID   string
 	Filter   string
@@ -79,30 +153,8 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 			Tasks struct {
 				Rev  string `json:"rev"`
 				List []struct {
-					ID         string `json:"id"`
-					TaskSeries []struct {
-						ID         string          `json:"id"`
-						Created    DateTime        `json:"created"`
-						Modified   DateTime        `json:"modified"`
-						Name       string          `json:"name"`
-						Source     string          `json:"source"`
-						URL        string          `json:"url"`
-						LocationID string          `json:"location_id"`
-						Tags       json.RawMessage `json:"tags"`
-						Notes      json.RawMessage `json:"notes"`
-						Task       []struct {
-							ID           string      `json:"id"`
-							Due          DateTime    `json:"due"`
-							HasDueTime   rtmBool     `json:"has_due_time"`
-							Added        DateTime    `json:"added"`
-							Completed    DateTime    `json:"completed"`
-							Deleted      DateTime    `json:"deleted"`
-							Priority     Priority    `json:"priority"`
-							Estimate     rtmDuration `json:"estimate"`
-							Start        DateTime    `json:"start"`
-							HasStartTime rtmBool     `json:"has_start_time"`
-						} `json:"task"`
-					} `json:"taskseries"`
+					ID         string           `json:"id"`
+					TaskSeries []taskSeriesResp `json:"taskseries"`
 				} `json:"list"`
 			} `json:"tasks"`
 		} `json:"rsp"`
@@ -136,45 +188,14 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 				}
 			}
 
-			// in RTM JSON API, tags are returned as either empty JSON array (when there are no tags),
-			// or as an object with a single field "tag" containing array
-			var tags []string
-			if string(ts.Tags) != "[]" {
-				var tagsResp struct {
-					Tags []string `json:"tag"`
-				}
-				if err := json.Unmarshal(ts.Tags, &tagsResp); err != nil {
-					return nil, err
-				}
-
-				tags = tagsResp.Tags
+			tags, err := ts.parseTags()
+			if err != nil {
+				return nil, err
 			}
 
-			// in RTM JSON API, notes are returned as either empty JSON array (when there are no notes),
-			// or as an object with a single field "note" containing array
-			var notes []Note
-			if string(ts.Notes) != "[]" {
-				var notesResp struct {
-					Note []struct {
-						ID       string   `json:"id"`
-						Created  DateTime `json:"created"`
-						Modified DateTime `json:"modified"`
-						Text     string   `json:"$t"`
-					} `json:"note"`
-				}
-				if err := json.Unmarshal(ts.Notes, &notesResp); err != nil {
-					return nil, err
-				}
-
-				notes = make([]Note, len(notesResp.Note))
-				for j, n := range notesResp.Note {
-					notes[j] = Note{
-						ID:       n.ID,
-						Created:  n.Created,
-						Modified: n.Modified,
-						Text:     n.Text,
-					}
-				}
+			notes, err := ts.parseNotes()
+			if err != nil {
+				return nil, err
 			}
 
 			taskSeries[i] = TaskSeries{
@@ -203,19 +224,8 @@ type TasksAddParams struct {
 	ParentTaskID string
 }
 
-type tasksAddResponseList struct {
-	XMLName    xml.Name   `json:"list"`
-	ListID     string     `json:"id"`
-	TaskSeries TaskSeries `json:"taskseries"`
-}
-
-type tasksAddResponse struct {
-	// Transaction          *Transaction         `json:"transaction"`
-	TasksAddResponseList tasksAddResponseList `json:"list"`
-}
-
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.add.rtm
-func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAddParams) (*TaskSeries, error) {
+func (t *TasksService) Add(ctx context.Context, timeline string, params *TasksAddParams) (*TaskSeries, error) {
 	args := Args{
 		"timeline": timeline,
 		"name":     params.Name,
@@ -235,12 +245,23 @@ func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAdd
 		return nil, err
 	}
 
-	var resp tasksAddResponse
-	if err = xml.Unmarshal(b, &resp); err != nil {
+	return t.addUnmarshal(b)
+}
+
+func (t *TasksService) addUnmarshal(b []byte) (*TaskSeries, error) {
+	var resp struct {
+		Rsp struct {
+			Transaction struct {
+				ID       string  `json:"id"`
+				Undoable rtmBool `json:"undoable"`
+			} `json:"transaction"`
+		}
+	}
+	if err := json.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
 
-	return &resp.TasksAddResponseList.TaskSeries, nil
+	return nil, nil
 }
 
 type TasksDeleteParams struct {
