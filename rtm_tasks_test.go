@@ -109,7 +109,7 @@ func TestTasks(t *testing.T) {
 
 		t.Run("Decode", func(t *testing.T) {
 			var actual tasksAddResponse
-			unmarshalTestdataFile(t, "rtm.tasks.add.xml", &actual)
+			unmarshalTestdataFileXML(t, "rtm.tasks.add.xml", &actual)
 			assert.Equal(t, expected, actual)
 		})
 

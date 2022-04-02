@@ -11,7 +11,7 @@ func TestClient(t *testing.T) {
 	t.Run("NoError", func(t *testing.T) {
 		t.Run("Unmarshal", func(t *testing.T) {
 			b := readTestdataFile(t, "rtm.test.echo.json")
-			_, err := new(Client).callJSONUnmarshal(b)
+			_, err := unmarshalJSONRsp(b)
 			require.NoError(t, err)
 		})
 
@@ -29,7 +29,7 @@ func TestClient(t *testing.T) {
 
 		t.Run("Unmarshal", func(t *testing.T) {
 			b := readTestdataFile(t, "no.such.method.json")
-			_, actual := new(Client).callJSONUnmarshal(b)
+			_, actual := unmarshalJSONRsp(b)
 			assert.Equal(t, expected, actual)
 		})
 

@@ -173,7 +173,7 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 		s := string(b)
 		for _, p := range []string{c.APIKey, c.APISecret, c.AuthToken} {
 			if p != "" {
-				s = strings.Replace(s, p, "XXX", -1)
+				s = strings.ReplaceAll(s, p, "XXX")
 			}
 		}
 		if err = ioutil.WriteFile(filename, []byte(s), 0666); err != nil {
@@ -204,28 +204,7 @@ func unmarshalXMLRsp(b []byte) ([]byte, error) {
 	}
 }
 
-// TODO remove
-func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, error) {
-	b, err := c.post(ctx, method, args, "")
-	if err != nil {
-		return nil, err
-	}
-
-	return unmarshalXMLRsp(b)
-}
-
-// TODO rename to Call
-func (c *Client) CallJSON(ctx context.Context, method string, args Args) ([]byte, error) {
-	b, err := c.post(ctx, method, args, "json")
-	if err != nil {
-		return nil, err
-	}
-
-	return c.callJSONUnmarshal(b)
-}
-
-// TODO rename to callUnmarshal
-func (c *Client) callJSONUnmarshal(b []byte) ([]byte, error) {
+func unmarshalJSONRsp(b []byte) ([]byte, error) {
 	var resp struct {
 		Rsp struct {
 			Stat string `json:"stat"`
@@ -250,6 +229,26 @@ func (c *Client) callJSONUnmarshal(b []byte) ([]byte, error) {
 	default:
 		return b, nil
 	}
+}
+
+// TODO remove
+func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, error) {
+	b, err := c.post(ctx, method, args, "")
+	if err != nil {
+		return nil, err
+	}
+
+	return unmarshalXMLRsp(b)
+}
+
+// TODO rename to Call
+func (c *Client) CallJSON(ctx context.Context, method string, args Args) ([]byte, error) {
+	b, err := c.post(ctx, method, args, "json")
+	if err != nil {
+		return nil, err
+	}
+
+	return unmarshalJSONRsp(b)
 }
 
 // check interfaces
