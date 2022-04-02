@@ -23,7 +23,7 @@ type AuthInfo struct {
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.auth.checkToken.rtm
 func (a *AuthService) CheckToken(ctx context.Context) (*AuthInfo, error) {
-	b, err := a.client.CallJSON(ctx, "rtm.auth.checkToken", nil)
+	b, err := a.client.Call(ctx, "rtm.auth.checkToken", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (a *AuthService) checkTokenUnmarshal(b []byte) (*AuthInfo, error) {
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.auth.getFrob.rtm
 func (a *AuthService) GetFrob(ctx context.Context) (string, error) {
-	b, err := a.client.CallJSON(ctx, "rtm.auth.getFrob", nil)
+	b, err := a.client.Call(ctx, "rtm.auth.getFrob", nil)
 	if err != nil {
 		return "", err
 	}
@@ -85,7 +85,7 @@ func (a *AuthService) getFrobUnmarshal(b []byte) (string, error) {
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.auth.getToken.rtm
 func (a *AuthService) GetToken(ctx context.Context, frob string) (*AuthInfo, error) {
-	b, err := a.client.CallJSON(ctx, "rtm.auth.getToken", Args{"frob": frob})
+	b, err := a.client.Call(ctx, "rtm.auth.getToken", Args{"frob": frob})
 	if err != nil {
 		return nil, err
 	}

@@ -3,7 +3,6 @@ package rtm
 import (
 	"context"
 	"encoding/json"
-	"encoding/xml"
 	"io/ioutil"
 	"log"
 	"os"
@@ -76,19 +75,9 @@ func unmarshalTestdataFile(t testing.TB, filename string, v interface{}) {
 	t.Helper()
 
 	b := readTestdataFile(t, filename)
-	b, err := unmarshalJSONRsp(b)
+	err := checkErrorResponse(b)
 	require.NoError(t, err)
 	err = json.Unmarshal(b, v)
-	require.NoError(t, err)
-}
-
-func unmarshalTestdataFileXML(t testing.TB, filename string, v interface{}) {
-	t.Helper()
-
-	b := readTestdataFile(t, filename)
-	b, err := unmarshalXMLRsp(b)
-	require.NoError(t, err)
-	err = xml.Unmarshal(b, v)
 	require.NoError(t, err)
 }
 

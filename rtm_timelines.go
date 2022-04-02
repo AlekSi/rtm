@@ -11,7 +11,7 @@ type TimelinesService struct {
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.timelines.create.rtm
 func (t *TimelinesService) Create(ctx context.Context) (string, error) {
-	b, err := t.client.CallJSON(ctx, "rtm.timelines.create", nil)
+	b, err := t.client.Call(ctx, "rtm.timelines.create", nil)
 	if err != nil {
 		return "", err
 	}

@@ -18,7 +18,7 @@ type MethodInfo struct {
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.reflection.getMethodInfo.rtm
 func (r *ReflectionService) GetMethodInfo(ctx context.Context, method string) (*MethodInfo, error) {
-	b, err := r.client.CallJSON(ctx, "rtm.reflection.getMethodInfo", Args{"method_name": method})
+	b, err := r.client.Call(ctx, "rtm.reflection.getMethodInfo", Args{"method_name": method})
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (r *ReflectionService) getMethodInfoUnmarshal(b []byte) (*MethodInfo, error
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.reflection.getMethods.rtm
 func (r *ReflectionService) GetMethods(ctx context.Context) ([]string, error) {
-	b, err := r.client.CallJSON(ctx, "rtm.reflection.getMethods", nil)
+	b, err := r.client.Call(ctx, "rtm.reflection.getMethods", nil)
 	if err != nil {
 		return nil, err
 	}

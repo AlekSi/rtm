@@ -21,7 +21,7 @@ type List struct {
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.lists.getList.rtm
 func (l *ListsService) GetList(ctx context.Context) ([]List, error) {
-	b, err := l.client.CallJSON(ctx, "rtm.lists.getList", nil)
+	b, err := l.client.Call(ctx, "rtm.lists.getList", nil)
 	if err != nil {
 		return nil, err
 	}

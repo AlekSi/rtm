@@ -65,7 +65,7 @@ func (t *TasksService) GetList(ctx context.Context, params *TasksGetListParams) 
 		}
 	}
 
-	b, err := t.client.CallJSON(ctx, "rtm.tasks.getList", args)
+	b, err := t.client.Call(ctx, "rtm.tasks.getList", args)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ func (t *TasksService) Add(ctx context.Context, timeline string, params TasksAdd
 		args["parent_task_id"] = params.ParentTaskID
 	}
 
-	b, err := t.client.CallJSON(ctx, "rtm.tasks.add", args)
+	b, err := t.client.Call(ctx, "rtm.tasks.add", args)
 	if err != nil {
 		return nil, err
 	}
@@ -258,6 +258,6 @@ func (t *TasksService) Delete(ctx context.Context, timeline string, params Tasks
 		"task_id":       params.TaskID,
 	}
 
-	_, err := t.client.CallJSON(ctx, "rtm.tasks.delete.rtm", args)
+	_, err := t.client.Call(ctx, "rtm.tasks.delete.rtm", args)
 	return err
 }

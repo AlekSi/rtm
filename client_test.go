@@ -11,31 +11,31 @@ func TestClient(t *testing.T) {
 	t.Run("NoError", func(t *testing.T) {
 		t.Run("Unmarshal", func(t *testing.T) {
 			b := readTestdataFile(t, "rtm.test.echo.json")
-			_, err := unmarshalJSONRsp(b)
+			err := checkErrorResponse(b)
 			require.NoError(t, err)
 		})
 
 		t.Run("Real", func(t *testing.T) {
-			_, err := GetClient(t).CallJSON(Ctx, "rtm.test.echo", Args{"foo": "bar"})
+			_, err := GetClient(t).Call(Ctx, "rtm.test.echo", Args{"foo": "bar"})
 			require.NoError(t, err)
 		})
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		expected := &Error{
+		expectedErr := &Error{
 			Code: 112,
 			Msg:  `Method "no.such.method" not found`,
 		}
 
 		t.Run("Unmarshal", func(t *testing.T) {
 			b := readTestdataFile(t, "no.such.method.json")
-			_, actual := unmarshalJSONRsp(b)
-			assert.Equal(t, expected, actual)
+			err := checkErrorResponse(b)
+			assert.Equal(t, expectedErr, err)
 		})
 
 		t.Run("Real", func(t *testing.T) {
-			_, actual := GetClient(t).CallJSON(Ctx, "no.such.method", nil)
-			assert.Equal(t, expected, actual)
+			_, actual := GetClient(t).Call(Ctx, "no.such.method", nil)
+			assert.Equal(t, expectedErr, actual)
 		})
 	})
 }
