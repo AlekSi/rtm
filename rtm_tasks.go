@@ -3,6 +3,7 @@ package rtm
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -54,6 +55,26 @@ type taskResp struct {
 	Estimate     rtmDuration `json:"estimate"`
 	Start        DateTime    `json:"start"`
 	HasStartTime rtmBool     `json:"has_start_time"`
+}
+
+func (t *taskResp) parseTask() *Task {
+	if !t.HasDueTime {
+		t.Due.stripTime()
+	}
+	if !t.HasStartTime {
+		t.Start.stripTime()
+	}
+
+	return &Task{
+		ID:        t.ID,
+		Due:       t.Due,
+		Added:     t.Added,
+		Completed: t.Completed,
+		Deleted:   t.Deleted,
+		Priority:  t.Priority,
+		Estimate:  t.Estimate.Duration,
+		Start:     t.Start,
+	}
 }
 
 type taskSeriesResp struct {
@@ -118,6 +139,36 @@ func (ts *taskSeriesResp) parseNotes() ([]Note, error) {
 	return res, nil
 }
 
+func (ts *taskSeriesResp) parseTaskSeries() (*TaskSeries, error) {
+	tasks := make([]Task, len(ts.Task))
+	for j, t := range ts.Task {
+		tasks[j] = *t.parseTask()
+	}
+
+	tags, err := ts.parseTags()
+	if err != nil {
+		return nil, err
+	}
+
+	notes, err := ts.parseNotes()
+	if err != nil {
+		return nil, err
+	}
+
+	return &TaskSeries{
+		ID:         ts.ID,
+		Created:    ts.Created,
+		Modified:   ts.Modified,
+		Name:       ts.Name,
+		Source:     ts.Source,
+		URL:        ts.URL,
+		LocationID: ts.LocationID,
+		Tags:       tags,
+		Notes:      notes,
+		Task:       tasks,
+	}, nil
+}
+
 type TasksGetListParams struct {
 	ListID   string
 	Filter   string
@@ -168,48 +219,12 @@ func (t *TasksService) getListUnmarshal(b []byte) (map[string][]TaskSeries, erro
 	for _, l := range resp.Rsp.Tasks.List {
 		taskSeries := make([]TaskSeries, len(l.TaskSeries))
 		for i, ts := range l.TaskSeries {
-			tasks := make([]Task, len(ts.Task))
-			for j, t := range ts.Task {
-				if !t.HasDueTime {
-					t.Due.stripTime()
-				}
-				if !t.HasStartTime {
-					t.Start.stripTime()
-				}
-				tasks[j] = Task{
-					ID:        t.ID,
-					Due:       t.Due,
-					Added:     t.Added,
-					Completed: t.Completed,
-					Deleted:   t.Deleted,
-					Priority:  t.Priority,
-					Estimate:  t.Estimate.Duration,
-					Start:     t.Start,
-				}
-			}
-
-			tags, err := ts.parseTags()
+			p, err := ts.parseTaskSeries()
 			if err != nil {
 				return nil, err
 			}
 
-			notes, err := ts.parseNotes()
-			if err != nil {
-				return nil, err
-			}
-
-			taskSeries[i] = TaskSeries{
-				ID:         ts.ID,
-				Created:    ts.Created,
-				Modified:   ts.Modified,
-				Name:       ts.Name,
-				Source:     ts.Source,
-				URL:        ts.URL,
-				LocationID: ts.LocationID,
-				Tags:       tags,
-				Notes:      notes,
-				Task:       tasks,
-			}
+			taskSeries[i] = *p
 		}
 		res[l.ID] = taskSeries
 	}
@@ -255,13 +270,22 @@ func (t *TasksService) addUnmarshal(b []byte) (*TaskSeries, error) {
 				ID       string  `json:"id"`
 				Undoable rtmBool `json:"undoable"`
 			} `json:"transaction"`
+			List struct {
+				ID         string           `json:"id"`
+				TaskSeries []taskSeriesResp `json:"taskseries"`
+			} `json:"list"`
 		}
 	}
 	if err := json.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	ts := resp.Rsp.List.TaskSeries
+	if l := len(ts); l != 1 {
+		return nil, fmt.Errorf("expected 1 taskseries, got %d", l)
+	}
+
+	return ts[0].parseTaskSeries()
 }
 
 type TasksDeleteParams struct {
@@ -271,7 +295,7 @@ type TasksDeleteParams struct {
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.delete.rtm
-func (t *TasksService) Delete(ctx context.Context, timeline string, params TasksDeleteParams) error {
+func (t *TasksService) Delete(ctx context.Context, timeline string, params *TasksDeleteParams) error {
 	args := Args{
 		"timeline":      timeline,
 		"list_id":       params.ListID,

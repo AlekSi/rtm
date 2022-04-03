@@ -80,54 +80,47 @@ func TestTasks(t *testing.T) {
 		})
 	})
 
-	// t.Run("Add", func(t *testing.T) {
-	// 	expected := tasksAddResponse{
-	// 		TasksAddResponseList: tasksAddResponseList{
-	// 			XMLName: xml.Name{Local: "list"},
-	// 			ListID:  "43911488",
-	// 			TaskSeries: TaskSeries{
-	// 				ID: "403924673",
-	// 				// Created:  parseTime(t, "2020-01-14T06:23:58Z"),
-	// 				// Modified: parseTime(t, "2020-01-14T06:23:58Z"),
-	// 				Name:   "TestTasks/AddDelete",
-	// 				Source: "api:XXX",
-	// 				Task: []Task{{
-	// 					ID: "706419831",
-	// 					// Added:    parseTime(t, "2020-01-14T06:23:58Z"),
-	// 					Priority: "N",
-	// 				}},
-	// 			},
-	// 		},
-	// 	}
+	t.Run("Add", func(t *testing.T) {
+		expected := &TaskSeries{
+			ID:       "467252622",
+			Created:  parseDateTime(t, "2022-01-22T10:12:43Z"),
+			Modified: parseDateTime(t, "2022-01-22T10:12:43Z"),
+			Name:     "TestTasks/Add/Real",
+			Source:   "api:XXX",
+			Task: []Task{{
+				ID:       "856005635",
+				Added:    parseDateTime(t, "2022-01-22T10:12:43Z"),
+				Priority: "N",
+			}},
+		}
 
-	// 	t.Run("Decode", func(t *testing.T) {
-	// 		t.Skip("TODO")
+		t.Run("Unmarshal", func(t *testing.T) {
+			b := readTestdataFile(t, "rtm.tasks.add.json")
+			actual, err := new(Client).Tasks().addUnmarshal(b)
+			require.NoError(t, err)
+			assert.Equal(t, expected, actual)
+		})
 
-	// 		_ = expected
+		t.Run("Real", func(t *testing.T) {
+			t.Skip("TODO")
 
-	// 		// var actual tasksAddResponse
-	// 		// unmarshalTestdataFileXML(t, "rtm.tasks.add.xml", &actual)
-	// 		// assert.Equal(t, expected, actual)
-	// 	})
+			// timeline, err := GetClient(t).Timelines().Create(Ctx)
+			// require.NoError(t, err)
 
-	// 	t.Run("Real", func(t *testing.T) {
-	// 		timeline, err := GetClient(t).Timelines().Create(Ctx)
-	// 		require.NoError(t, err)
+			// task, err := GetClient(t).Tasks().Add(Ctx, timeline, TasksAddParams{
+			// 	ListID: "43911488",
+			// 	Name:   t.Name(),
+			// })
+			// require.NoError(t, err)
+			// t.Log(task)
+			// require.NotEmpty(t, task.Task)
 
-	// 		task, err := GetClient(t).Tasks().Add(Ctx, timeline, TasksAddParams{
-	// 			ListID: "43911488",
-	// 			Name:   t.Name(),
-	// 		})
-	// 		require.NoError(t, err)
-	// 		t.Log(task)
-	// 		require.NotEmpty(t, task.Task)
-
-	// 		err = GetClient(t).Tasks().Delete(Ctx, timeline, TasksDeleteParams{
-	// 			ListID:       "43911488",
-	// 			TaskSeriesID: task.ID,
-	// 			TaskID:       task.Task[0].ID,
-	// 		})
-	// 		require.NoError(t, err)
-	// 	})
-	// })
+			// err = GetClient(t).Tasks().Delete(Ctx, timeline, TasksDeleteParams{
+			// 	ListID:       "43911488",
+			// 	TaskSeriesID: task.ID,
+			// 	TaskID:       task.Task[0].ID,
+			// })
+			// require.NoError(t, err)
+		})
+	})
 }
