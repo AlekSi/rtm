@@ -60,12 +60,13 @@
                 "rtm.push.getTopics",
                 "rtm.push.subscribe",
                 "rtm.push.unsubscribe",
-                "rtm.script.getList",
+                "rtm.scripts.getList",
                 "rtm.scripts.add",
                 "rtm.scripts.delete",
                 "rtm.scripts.setName",
                 "rtm.scripts.setCode",
-                "rtm.script.run"
+                "rtm.scripts.setParams",
+                "rtm.scripts.run"
             ]
         }
     }
