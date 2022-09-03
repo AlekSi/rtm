@@ -102,25 +102,23 @@ func TestTasks(t *testing.T) {
 		})
 
 		t.Run("Real", func(t *testing.T) {
-			t.Skip("TODO")
+			timeline, err := GetClient(t).Timelines().Create(Ctx)
+			require.NoError(t, err)
 
-			// timeline, err := GetClient(t).Timelines().Create(Ctx)
-			// require.NoError(t, err)
+			task, err := GetClient(t).Tasks().Add(Ctx, timeline, &TasksAddParams{
+				ListID: "43911488",
+				Name:   t.Name(),
+			})
+			require.NoError(t, err)
+			t.Log(task)
+			require.NotEmpty(t, task.Task)
 
-			// task, err := GetClient(t).Tasks().Add(Ctx, timeline, TasksAddParams{
-			// 	ListID: "43911488",
-			// 	Name:   t.Name(),
-			// })
-			// require.NoError(t, err)
-			// t.Log(task)
-			// require.NotEmpty(t, task.Task)
-
-			// err = GetClient(t).Tasks().Delete(Ctx, timeline, TasksDeleteParams{
-			// 	ListID:       "43911488",
-			// 	TaskSeriesID: task.ID,
-			// 	TaskID:       task.Task[0].ID,
-			// })
-			// require.NoError(t, err)
+			err = GetClient(t).Tasks().Delete(Ctx, timeline, &TasksDeleteParams{
+				ListID:       "43911488",
+				TaskSeriesID: task.ID,
+				TaskID:       task.Task[0].ID,
+			})
+			require.NoError(t, err)
 		})
 	})
 }

@@ -303,6 +303,6 @@ func (t *TasksService) Delete(ctx context.Context, timeline string, params *Task
 		"task_id":       params.TaskID,
 	}
 
-	_, err := t.client.Call(ctx, "rtm.tasks.delete.rtm", args)
+	_, err := t.client.Call(ctx, "rtm.tasks.delete", args)
 	return err
 }
