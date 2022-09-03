@@ -50,7 +50,7 @@ func main() {
 			m, ok = m.Type.Out(0).MethodByName(methodName)
 			if ok {
 				serviceName += "Service"
-				docMethod = fmt.Sprintf("[`%[1]s.%[2]s`](https://godoc.org/github.com/AlekSi/rtm#%[1]s.%[2]s)", serviceName, methodName)
+				docMethod = fmt.Sprintf("[`%[1]s.%[2]s`](https://pkg.go.dev/github.com/AlekSi/rtm#%[1]s.%[2]s)", serviceName, methodName)
 			}
 		}
 
