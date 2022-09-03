@@ -48,7 +48,7 @@ type Client struct {
 	APISecret  string
 	AuthToken  string
 	HTTPClient *http.Client
-	Debugf     func(format string, args ...interface{})
+	Debugf     func(format string, args ...any)
 
 	recordTestdata bool // records testdata/tmp-XXX files
 }
@@ -105,17 +105,15 @@ func (c *Client) AuthenticationURL(perms Perms, frob string) string {
 	return u.String()
 }
 
-// post calls the given method with arguments, returning body in requested format (xml or json) or error.
-func (c *Client) post(ctx context.Context, method string, args Args, format string) ([]byte, error) {
+// post calls the given method with arguments, returning body or error.
+func (c *Client) post(ctx context.Context, method string, args Args) ([]byte, error) {
 	q := make(url.Values)
 	for k, v := range args {
 		q.Set(k, v)
 	}
 	q.Set("v", "2")
 	q.Set("method", method)
-	if format != "" {
-		q.Set("format", format)
-	}
+	q.Set("format", "json")
 	q.Set("api_key", c.APIKey)
 	if c.AuthToken != "" {
 		q.Set("auth_token", c.AuthToken)
@@ -169,11 +167,7 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 			}
 		}
 
-		ext := format
-		if format == "" || format == "rest" {
-			ext = "xml"
-		}
-		filename := filepath.Join("testdata", "tmp-"+method+"."+ext)
+		filename := filepath.Join("testdata", "tmp-"+method+".json")
 		if err = ioutil.WriteFile(filename, []byte(s), 0o666); err != nil {
 			return nil, err
 		}
@@ -211,7 +205,7 @@ func checkErrorResponse(b []byte) error {
 
 // Call calls the given method with arguments and returns response body or error.
 func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, error) {
-	b, err := c.post(ctx, method, args, "json")
+	b, err := c.post(ctx, method, args)
 	if err != nil {
 		return nil, err
 	}

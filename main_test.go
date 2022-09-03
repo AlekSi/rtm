@@ -71,7 +71,7 @@ func readTestdataFile(t testing.TB, filename string) []byte {
 	return b
 }
 
-func unmarshalTestdataFile(t testing.TB, filename string, v interface{}) {
+func unmarshalTestdataFile(t testing.TB, filename string, v any) {
 	t.Helper()
 
 	b := readTestdataFile(t, filename)
