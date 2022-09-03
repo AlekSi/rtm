@@ -39,7 +39,10 @@ func main() {
 
 	var token string
 	for i := 0; i < 30; i++ {
-		token, _ = client.Auth().GetToken(ctx, frob)
+		info, _ := client.Auth().GetToken(ctx, frob)
+		if info != nil {
+			token = info.Token
+		}
 		if token != "" {
 			break
 		}
