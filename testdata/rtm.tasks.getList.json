@@ -1,0 +1,93 @@
+{
+    "rsp": {
+        "stat": "ok",
+        "tasks": {
+            "rev": "15xsddtgimx34jsk1u8ux12nca2oqg5",
+            "list": [
+                {
+                    "id": "43911488",
+                    "taskseries": [
+                        {
+                            "id": "358441579",
+                            "created": "2018-08-05T09:30:53Z",
+                            "modified": "2020-08-01T13:05:09Z",
+                            "name": "Task 1",
+                            "source": "js",
+                            "url": "https://github.com/AlekSi/rtm",
+                            "location_id": "1265394",
+                            "parent_task_id": "",
+                            "tags": {
+                                "tag": [
+                                    "tag1",
+                                    "tag2"
+                                ]
+                            },
+                            "participants": [],
+                            "notes": {
+                                "note": [
+                                    {
+                                        "id": "81657666",
+                                        "created": "2020-08-01T13:05:09Z",
+                                        "modified": "2020-08-01T13:05:09Z",
+                                        "title": "",
+                                        "$t": "Note 2"
+                                    },
+                                    {
+                                        "id": "81657665",
+                                        "created": "2020-08-01T13:05:05Z",
+                                        "modified": "2020-08-01T13:05:05Z",
+                                        "title": "",
+                                        "$t": "Note 1"
+                                    }
+                                ]
+                            },
+                            "task": [
+                                {
+                                    "id": "622345829",
+                                    "due": "2018-08-06T20:30:00Z",
+                                    "has_due_time": "1",
+                                    "added": "2018-08-05T09:30:53Z",
+                                    "completed": "",
+                                    "deleted": "",
+                                    "priority": "N",
+                                    "postponed": "0",
+                                    "estimate": "",
+                                    "start": "2018-08-04T21:30:00Z",
+                                    "has_start_time": "1"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "358441583",
+                            "created": "2018-08-05T09:30:56Z",
+                            "modified": "2018-08-05T13:42:43Z",
+                            "name": "Задача 2",
+                            "source": "js",
+                            "url": "",
+                            "location_id": "",
+                            "parent_task_id": "",
+                            "tags": [],
+                            "participants": [],
+                            "notes": [],
+                            "task": [
+                                {
+                                    "id": "622345833",
+                                    "due": "2018-08-05T21:00:00Z",
+                                    "has_due_time": "0",
+                                    "added": "2018-08-05T09:30:56Z",
+                                    "completed": "2018-08-05T13:42:43Z",
+                                    "deleted": "",
+                                    "priority": "2",
+                                    "postponed": "0",
+                                    "estimate": "PT1H12M",
+                                    "start": "2018-08-04T21:00:00Z",
+                                    "has_start_time": "0"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

@@ -2,7 +2,7 @@ package rtm
 
 import (
 	"context"
-	"encoding/xml"
+	"encoding/json"
 )
 
 type TimelinesService struct {
@@ -16,13 +16,18 @@ func (t *TimelinesService) Create(ctx context.Context) (string, error) {
 		return "", err
 	}
 
+	return t.createUnmarshal(b)
+}
+
+func (t *TimelinesService) createUnmarshal(b []byte) (string, error) {
 	var resp struct {
-		XMLName xml.Name `xml:"timeline"`
-		ID      string   `xml:",chardata"`
+		Rsp struct {
+			Timeline string `json:"timeline"`
+		}
 	}
-	if err = xml.Unmarshal(b, &resp); err != nil {
+	if err := json.Unmarshal(b, &resp); err != nil {
 		return "", err
 	}
 
-	return resp.ID, nil
+	return resp.Rsp.Timeline, nil
 }

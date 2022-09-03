@@ -5,7 +5,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/xml"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -50,7 +50,7 @@ type Client struct {
 	HTTPClient *http.Client
 	Debugf     func(format string, args ...interface{})
 
-	recordTestdata bool
+	recordTestdata bool // records testdata/tmp-XXX files
 }
 
 func (c *Client) Auth() *AuthService             { return &AuthService{c} }
@@ -69,6 +69,7 @@ func (c *Client) http() *http.Client {
 }
 
 // sign adds api_sig to request parameters.
+//
 // See https://www.rememberthemilk.com/services/api/authentication.rtm, "Signing Requests".
 func (c *Client) sign(q url.Values) {
 	keys := make([]string, 0, len(q))
@@ -87,6 +88,7 @@ func (c *Client) sign(q url.Values) {
 }
 
 // AuthenticationURL returns authentication URL for given permissions and frob (that can be empty).
+//
 // See https://www.rememberthemilk.com/services/api/authentication.rtm, "User authentication for web-based applications"
 // and "User authentication for desktop applications".
 func (c *Client) AuthenticationURL(perms Perms, frob string) string {
@@ -103,6 +105,7 @@ func (c *Client) AuthenticationURL(perms Perms, frob string) string {
 	return u.String()
 }
 
+// post calls the given method with arguments, returning body in requested format (xml or json) or error.
 func (c *Client) post(ctx context.Context, method string, args Args, format string) ([]byte, error) {
 	q := make(url.Values)
 	for k, v := range args {
@@ -121,11 +124,10 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 
 	u := restEndpoint
 	u.RawQuery = q.Encode()
-	req, err := http.NewRequest("POST", u.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
 	req.Header.Set("User-Agent", userAgent)
 
 	if c.Debugf != nil {
@@ -137,20 +139,19 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 	}
 
 	resp, err := c.http().Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-
-		if c.Debugf != nil {
-			b, err := httputil.DumpResponse(resp, true)
-			if err != nil {
-				return nil, err
-			}
-			c.Debugf("Response:\n%s", b)
-		}
-	}
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
+	if c.Debugf != nil {
+		b, err := httputil.DumpResponse(resp, true)
+		if err != nil {
+			return nil, err
+		}
+		c.Debugf("Response:\n%s", b)
+	}
+
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP status code %d", resp.StatusCode)
 	}
@@ -161,18 +162,19 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 	}
 
 	if c.recordTestdata {
+		s := string(b) // do not mutate b that we return later
+		for _, p := range []string{c.APIKey, c.APISecret, c.AuthToken} {
+			if p != "" {
+				s = strings.ReplaceAll(s, p, "XXX")
+			}
+		}
+
 		ext := format
 		if format == "" || format == "rest" {
 			ext = "xml"
 		}
 		filename := filepath.Join("testdata", "tmp-"+method+"."+ext)
-		s := string(b)
-		for _, p := range []string{c.APIKey, c.APISecret, c.AuthToken} {
-			if p != "" {
-				s = strings.Replace(s, p, "XXX", -1)
-			}
-		}
-		if err = ioutil.WriteFile(filename, []byte(s), 0666); err != nil {
+		if err = ioutil.WriteFile(filename, []byte(s), 0o666); err != nil {
 			return nil, err
 		}
 	}
@@ -180,36 +182,43 @@ func (c *Client) post(ctx context.Context, method string, args Args, format stri
 	return b, nil
 }
 
-func unmarshalXMLRsp(b []byte) ([]byte, error) {
-	var rsp struct {
-		XMLName xml.Name `xml:"rsp"`
-		Stat    string   `xml:"stat,attr"`
-		Err     *Error   `xml:"err"`
-		Inner   []byte   `xml:",innerxml"`
+// checkErrorResponse checks response and returns error if it can't be parsed or contains error.
+func checkErrorResponse(b []byte) error {
+	var resp struct {
+		Rsp struct {
+			Stat string `json:"stat"`
+			Err  *struct {
+				Code int    `json:"code,string"`
+				Msg  string `json:"msg"`
+			} `json:"err"`
+		} `json:"rsp"`
 	}
-	err := xml.Unmarshal(b, &rsp)
+	err := json.Unmarshal(b, &resp)
 	switch {
 	case err != nil:
-		return nil, err
-	case rsp.Err != nil:
-		return nil, rsp.Err
-	case rsp.Stat != "ok":
-		return nil, fmt.Errorf("unexpected stat %q", rsp.Stat)
+		return err
+	case resp.Rsp.Err != nil:
+		return &Error{
+			Code: resp.Rsp.Err.Code,
+			Msg:  resp.Rsp.Err.Msg,
+		}
+	case resp.Rsp.Stat != "ok":
+		return fmt.Errorf("unexpected stat %q", resp.Rsp.Stat)
 	default:
-		return rsp.Inner, nil
+		return nil
 	}
 }
 
+// Call calls the given method with arguments and returns response body or error.
 func (c *Client) Call(ctx context.Context, method string, args Args) ([]byte, error) {
-	b, err := c.post(ctx, method, args, "")
+	b, err := c.post(ctx, method, args, "json")
 	if err != nil {
 		return nil, err
 	}
 
-	return unmarshalXMLRsp(b)
-}
+	if err = checkErrorResponse(b); err != nil {
+		return nil, err
+	}
 
-// check interfaces
-var (
-	_ error = (*Error)(nil)
-)
+	return b, nil
+}

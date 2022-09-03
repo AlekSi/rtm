@@ -2,7 +2,8 @@ package rtm
 
 import (
 	"context"
-	"encoding/xml"
+	"encoding/json"
+	"sort"
 )
 
 type ReflectionService struct {
@@ -21,18 +22,25 @@ func (r *ReflectionService) GetMethodInfo(ctx context.Context, method string) (*
 		return nil, err
 	}
 
+	return r.getMethodInfoUnmarshal(b)
+}
+
+func (r *ReflectionService) getMethodInfoUnmarshal(b []byte) (*MethodInfo, error) {
 	var resp struct {
-		XMLName    xml.Name `xml:"method"`
-		Name       string   `xml:"name,attr"`
-		NeedsLogin bool     `xml:"needslogin,attr"`
+		Rsp struct {
+			Method struct {
+				Name       string  `json:"name"`
+				NeedsLogin rtmBool `json:"needslogin"`
+			} `json:"method"`
+		} `json:"rsp"`
 	}
-	if err = xml.Unmarshal(b, &resp); err != nil {
+	if err := json.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
 
 	return &MethodInfo{
-		Name:       resp.Name,
-		NeedsLogin: resp.NeedsLogin,
+		Name:       resp.Rsp.Method.Name,
+		NeedsLogin: bool(resp.Rsp.Method.NeedsLogin),
 	}, nil
 }
 
@@ -43,13 +51,22 @@ func (r *ReflectionService) GetMethods(ctx context.Context) ([]string, error) {
 		return nil, err
 	}
 
+	return r.getMethodsUnmarshal(b)
+}
+
+func (r *ReflectionService) getMethodsUnmarshal(b []byte) ([]string, error) {
 	var resp struct {
-		XMLName xml.Name `xml:"methods"`
-		Methods []string `xml:"method"`
+		Rsp struct {
+			Methods struct {
+				Method []string `json:"method"`
+			} `json:"methods"`
+		} `json:"rsp"`
 	}
-	if err = xml.Unmarshal(b, &resp); err != nil {
+	if err := json.Unmarshal(b, &resp); err != nil {
 		return nil, err
 	}
 
-	return resp.Methods, nil
+	sort.Strings(resp.Rsp.Methods.Method)
+
+	return resp.Rsp.Methods.Method, nil
 }

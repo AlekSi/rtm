@@ -1,0 +1,17 @@
+---
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    labels: [deps]
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "04:42"
+  - package-ecosystem: "gomod"
+    directory: "/"
+    labels: [deps]
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "04:42"

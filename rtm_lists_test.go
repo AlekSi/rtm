@@ -35,10 +35,11 @@ func TestLists(t *testing.T) {
 			Archived: true,
 		}}
 
-		t.Run("Decode", func(t *testing.T) {
-			var actual listsGetListResponse
-			unmarshalTestdataFile(t, "rtm.lists.getList.xml", &actual)
-			assert.Equal(t, expected, actual.Lists)
+		t.Run("Unmarshal", func(t *testing.T) {
+			b := readTestdataFile(t, "rtm.lists.getList.json")
+			actual, err := new(Client).Lists().getListUnmarshal(b)
+			require.NoError(t, err)
+			assert.Equal(t, expected, actual)
 		})
 
 		t.Run("Real", func(t *testing.T) {

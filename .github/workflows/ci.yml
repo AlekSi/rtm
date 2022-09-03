@@ -11,23 +11,22 @@ jobs:
   test:
     strategy:
       matrix:
-        go: [1.14.x]
+        go: [1.18.x]
 
     name: Test with Go ${{ matrix.go }}
     runs-on: ubuntu-18.04
 
     steps:
     - name: Set up Go ${{ matrix.go }}
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ matrix.go }}
-      id: go
 
     - name: Check out code
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
 
-    - name: Download dependencies
-      run: go get -t ./...
+    - name: Tidy
+      run: go mod tidy
 
     - name: Install
       run: go install -v ./...
