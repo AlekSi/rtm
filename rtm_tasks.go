@@ -240,7 +240,7 @@ type TasksAddParams struct {
 }
 
 // https://www.rememberthemilk.com/services/api/methods/rtm.tasks.add.rtm
-func (t *TasksService) Add(ctx context.Context, timeline string, params *TasksAddParams) (*TaskSeries, error) {
+func (t *TasksService) Add(ctx context.Context, timeline string, params *TasksAddParams) (string, *TaskSeries, error) {
 	args := Args{
 		"timeline": timeline,
 		"name":     params.Name,
@@ -257,13 +257,13 @@ func (t *TasksService) Add(ctx context.Context, timeline string, params *TasksAd
 
 	b, err := t.client.Call(ctx, "rtm.tasks.add", args)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	return t.addUnmarshal(b)
 }
 
-func (t *TasksService) addUnmarshal(b []byte) (*TaskSeries, error) {
+func (t *TasksService) addUnmarshal(b []byte) (string, *TaskSeries, error) {
 	var resp struct {
 		Rsp struct {
 			Transaction struct {
@@ -277,15 +277,20 @@ func (t *TasksService) addUnmarshal(b []byte) (*TaskSeries, error) {
 		}
 	}
 	if err := json.Unmarshal(b, &resp); err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	ts := resp.Rsp.List.TaskSeries
 	if l := len(ts); l != 1 {
-		return nil, fmt.Errorf("expected 1 taskseries, got %d", l)
+		return "", nil, fmt.Errorf("expected 1 taskseries, got %d", l)
 	}
 
-	return ts[0].parseTaskSeries()
+	res, err := ts[0].parseTaskSeries()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return resp.Rsp.List.ID, res, nil
 }
 
 type TasksDeleteParams struct {

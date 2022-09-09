@@ -81,6 +81,7 @@ func TestTasks(t *testing.T) {
 	})
 
 	t.Run("Add", func(t *testing.T) {
+		expectedListID := "43911488"
 		expected := &TaskSeries{
 			ID:       "467252622",
 			Created:  parseDateTime(t, "2022-01-22T10:12:43Z"),
@@ -96,8 +97,9 @@ func TestTasks(t *testing.T) {
 
 		t.Run("Unmarshal", func(t *testing.T) {
 			b := readTestdataFile(t, "rtm.tasks.add.json")
-			actual, err := new(Client).Tasks().addUnmarshal(b)
+			actualListID, actual, err := new(Client).Tasks().addUnmarshal(b)
 			require.NoError(t, err)
+			assert.Equal(t, expectedListID, actualListID)
 			assert.Equal(t, expected, actual)
 		})
 
@@ -105,13 +107,14 @@ func TestTasks(t *testing.T) {
 			timeline, err := GetClient(t).Timelines().Create(Ctx)
 			require.NoError(t, err)
 
-			task, err := GetClient(t).Tasks().Add(Ctx, timeline, &TasksAddParams{
+			listID, task, err := GetClient(t).Tasks().Add(Ctx, timeline, &TasksAddParams{
 				ListID: "43911488",
 				Name:   t.Name(),
 			})
 			require.NoError(t, err)
 			t.Log(task)
 			require.NotEmpty(t, task.Task)
+			require.Equal(t, listID, "43911488")
 
 			err = GetClient(t).Tasks().Delete(Ctx, timeline, &TasksDeleteParams{
 				ListID:       "43911488",
