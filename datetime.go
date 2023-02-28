@@ -27,10 +27,15 @@ func (t DateTime) String() string {
 	if t.IsZero() {
 		return ""
 	}
-	if !t.hasTime {
+	if t.DateOnly() {
 		return t.Format(dateFormat)
 	}
 	return t.Format(dateTimeFormat)
+}
+
+// DateOnly returns true if this DateTime has no time part.
+func (t DateTime) DateOnly() bool {
+	return !t.hasTime
 }
 
 // MarshalJSON implements json.Marshaler.
